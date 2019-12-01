@@ -29,7 +29,7 @@ format=line|yaml|json
 忽略所有条件, 查询所有成员的参与度
 
 --complete 
-以完整模式输出, 显示完成的 commitId, 且不排除 Merge 类型的提交
+以完整模式输出, 显示完整的 commitId, 且不排除 Merge 类型的提交
 ``` 
 
 
