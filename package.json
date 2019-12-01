@@ -1,0 +1,11 @@
+{
+  "name": "gitday",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "gitday": "gitday.js"
+  },
+  "keywords": [],
+  "author": "xw",
+  "license": "ISC"
+}
