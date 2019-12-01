@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // https://git-scm.com/docs/git-log
 const cp = require('child_process')
 const json2yaml = require(absPath('./json2yaml.js'))
