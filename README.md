@@ -1,6 +1,12 @@
 # gitday
 以作者及日期查询 git提交日志, 并进行统计和格式化.
 
+## 体验或安装
+``` sh
+npx github:wll8/gitday --help
+npm i -g wll8/gitday && gitday --help
+```
+
 ## 参数:
 
 ``` txt
