@@ -253,7 +253,7 @@ function print(...arg) {
  * @param {array} param0.list - 数据
  * @param {boolean} [param0.showNew = true] - 是否把新时间排到前面
  */
-function toMd({tag = `day`, list = [], showNew = true}){
+function toMd({tag = `month`, list = [], showNew = true}){
   list = list.map(obj => { // 先把每个类型的时间取出来方便使用
     obj.timeStamp = new Date(obj.date).getTime()
     obj.dateObj = {
@@ -272,105 +272,56 @@ function toMd({tag = `day`, list = [], showNew = true}){
 
   const handleObj =  {
     'month'(list) {
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月',
+        ],
+        list,
+      })
     },
     'month-week'(list) {
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月`,
-          `\n### 第${week}周`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月',
+          '### 第${week}周',
+        ],
+        list,
+      })
     },
     'month-week-day'(list) {
-      console.log(`listlist`, list)
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week, weekDay} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月`,
-          `\n### 第${week}周`,
-          `\n#### 礼拜${weekDay}`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月',
+          '### 第${week}周',
+          '#### 礼拜${weekDay}',
+        ],
+        list,
+      })
     },
     'week'(list) {
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月 第${week}周`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月 第${week}周',
+        ],
+        list,
+      })
     },
     'week-day'(list) {
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week, weekDay} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月 第${week}周`,
-          `\n## 礼拜${weekDay}`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月 第${week}周',
+          '### 礼拜${weekDay}',
+        ],
+        list,
+      })
     },
     'day'(list) {
-      let oldTitle = ``
-      const str = list.map(item => {
-        const {year, month, week, day, weekDay} = item.dateObj
-        const newTitle = [
-          `\n## ${year}年${month}月${day}日`,
-        ].join(``)
-        let str = ``
-        if(oldTitle !== newTitle) {
-          oldTitle = newTitle
-          str = newTitle
-        }
-        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-      }).join(`\n`).trim()
-      return str
+      return create({
+        tag: [
+          '## ${year}年${month}月${day}日',
+        ],
+        list,
+      })
     },
   }
 
@@ -378,6 +329,24 @@ function toMd({tag = `day`, list = [], showNew = true}){
   const res = handle ? handle(list) : new Error(`不支持的标记`);
   // console.log(`res`, JSON.stringify(res, null, 2))
   console.log(`res`, res)
+
+  function create({tag, list}) {
+    let oldTitle = ``
+    const str = list.map(item => {
+      const newTitle = tag.map(title => {
+        title = `({ year, month, week, day, weekDay }) => \`\n${title}\``
+        return eval.call(null, title)(item.dateObj)
+      } ).join(``)
+      let str = ``
+      if(oldTitle !== newTitle) {
+        oldTitle = newTitle
+        str = newTitle
+      }
+      return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+    }).join(`\n`).trim()
+    return str
+  }
+  
 }
 
 function sort(showNew, key) {
