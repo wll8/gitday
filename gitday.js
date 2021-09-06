@@ -17,9 +17,46 @@ const query = {
 
 { // 关联参数特殊处理
   if(query.help) {
-    const cliName = 'gitday'
+    const cliName = 'gitday' // todo rename to codelog
     print(
 `
+--month
+## 2021年01月
+- commitNsg
+- commitNsg
+
+--month-week
+## 2021年01月
+### 第1周
+- commitNsg
+- commitNsg
+
+--month-week-day
+## 2021年01月
+### 第1周
+#### 礼拜1
+- commitNsg
+- commitNsg
+
+--week
+## 2021年01月 第1周
+- commitNsg
+- commitNsg
+
+--week-day
+## 2021年01月 第1周
+### 礼拜1
+- commitNsg
+- commitNsg
+
+--day
+## 2021年01月24日
+- commitNsg
+- commitNsg
+
+
+
+
 以作者及日期为条件，进行日志查询、统计和格式化.
 
 参数:
@@ -42,6 +79,11 @@ ${cliName} name=小明 date=@-1 # 昨天小明做了什么?
 ${cliName} name=小明 date=2019-09-09 # 2019-09-09 小明做了什么?
 ${cliName} --all --partake # 统计这个项目中所有开发人员的参与情况?
 
+-month
+-week
+-day
+-支持组合, 例如 week-day
+
 `)
     return
   }
@@ -55,8 +97,13 @@ ${cliName} --all --partake # 统计这个项目中所有开发人员的参与情
   }
 }
 
-const cmdRes = execSync('git log --all --decorate') // --all 显示所有分支 --decorate 显示完整的提交分支
+const author = execSync(`git config user.name`) // 获取当前配置的 git 用户名
+const cmdRes = execSync(`git log --author="${author}" --all --decorate --since=1.months`) // --all 显示所有分支 --decorate 显示完整的提交分支
 const list = paserLogToList(cmdRes)
+console.log(`list`, list)
+toMd({list})
+process.exit()
+
 const filterList = list.filter(item => {
   return (
     (query.complete || !item.Merge) // 完整模式下不排除 Merge 类型的提交
@@ -70,6 +117,7 @@ const filterList = list.filter(item => {
   )
 })
 
+
 const obj = listToAuthorDay(filterList)
 
 if(query.partake) {
@@ -80,6 +128,8 @@ if(query.partake) {
 
 const stringifyObj = JSON.stringify(obj, null, 2)
 
+
+process.exit()
 // fs.writeFileSync(absPath('./gitday.json'), stringifyObj)
 
 ;({
@@ -149,19 +199,14 @@ function listToAuthorDay(list) { // 转换 log list
 
 function paserLogToList(str) { // 把 git log 的内容解析为数组
   str = `\n${str}`
-  let tag = '\ncommit '
-  let list = str.split(tag).filter(item => item.trim()).map(item => {
-    let obj = {}
-    item.split('\n').forEach(line => {
-      let [, key, val] = line.match(/^(\w+):\s+(.*)/) || [] // 使用正则取出 key val
-      if(key) {
-        obj[key] = val // 把每行中的值设置到对象的 key 上
-        key === 'Date' && (obj[key] = (dateFormater(new Date(val), 'YYYY-MM-DD HH:mm:ss')) ) // 格式化时间
-      }
-    })
-    obj.Commit = (item.match(/(.*)\n/) || [])[1]
-    obj.Msg = (item.match(/    [\s\S]+?$/) || [])[0] // 匹配 msg 信息
-    obj.Msg = obj.Msg // 去除 msg 前面的多于空格
+  const tag = /\ncommit /
+  const list = str.split(tag).filter(item => item.trim()).map(item => {
+    const obj = {}
+    // obj.Raw = item
+    obj.date = (dateFormater((item.match(/Date:(.*)/) || [])[1].trim(), 'YYYY-MM-DD HH:mm:ss'))
+    obj.commit = (item.match(/(.*)\n/) || [])[1].trim()
+    obj.author = (item.match(/Author:(.*)/) || [])[1].trim()
+    obj.msg = (item.match(/    [\s\S]+?$/) || [])[0] // 去除 msg 前面的多于空格
       .split('\n')
       .reduce((all, str) => all + (str.replace('    ', '\n')), '')
       .trim()
@@ -192,9 +237,161 @@ function absPath(file = '') {
 }
 
 function execSync(cmd) {
+  console.log([`>`, console.log(cmd)].join(`\n`))
   return cp.execSync(cmd).toString().trim()
 }
 
 function print(...arg) {
   return console.log(...arg)
+}
+
+
+/**
+ * 根据标志对应的时间转换为 markdown 格式
+ * @param {object} param0 
+ * @param {string} [param0.tag = day] - 标记
+ * @param {array} param0.list - 数据
+ * @param {boolean} [param0.showNew = true] - 是否把新时间排到前面
+ */
+function toMd({tag = `month`, list = [], showNew = true}){
+  list = list.map(obj => { // 先把每个类型的时间取出来方便使用
+    obj.timeStamp = new Date(obj.date).getTime()
+    obj.dateObj = {
+      year: dateFormater(obj.date, `YYYY`),
+      month: dateFormater(obj.date, `MM`),
+      week: Math.ceil(new Date(obj.date).getDate() / 7),
+      day: dateFormater(obj.date, `DD`),
+      weekDay: new Date(obj.date).getDay() + 1, // 礼拜n
+
+      // month: dateFormater(obj.date, `YYYY年MM月`),
+      // week: `${dateFormater(obj.date, `YYYY年MM月`)} 第${Math.ceil(new Date(obj.date).getDate() / 7)}周 礼拜${new Date(obj.date).getDay() + 1}` ,
+      // day: `${dateFormater(obj.date, `YYYY年MM月DD日`)}` ,
+    }
+    return obj
+  })
+
+  const handleObj =  {
+    'month'(list) {
+      const obj = list.reduce((acc, cur) => {
+        const dateObj = cur.dateObj
+        const key = `${dateObj.year}${dateObj.month}`
+        return {
+          ...acc,
+          [key]: [
+            ...(acc[key] || []),
+            cur,
+          ],
+        }
+      }, {})
+      console.log(`month`, obj)
+      return obj
+    },
+    'month-week'(list) {
+      let obj = handleObj[`month`](list)
+      obj = Object.entries(obj).reduce((acc, [key, val]) => {
+        const obj = val.reduce((acc, cur) => {
+          const dateObj = cur.dateObj
+          const key = `${dateObj.week}`
+          return {
+            ...acc,
+            [key]: [
+              ...(acc[key] || []),
+              cur,
+            ],
+          }
+        }, {})
+        return {
+          ...acc,
+          [key]: obj,
+        }
+      }, {})
+      return obj
+    },
+    'month-week-day'(list) {
+      let obj = handleObj[`month-week`](list)
+      obj = Object.entries(obj).reduce((acc, [key, val]) => {
+        obj = Object.entries(val).reduce((acc, [key, val]) => {
+          const obj = val.reduce((acc, cur) => {
+            const dateObj = cur.dateObj
+            const key = `${dateObj.weekDay}`
+            return {
+              ...acc,
+              [key]: [
+                ...(acc[key] || []),
+                cur,
+              ],
+            }
+          }, {})
+          return {
+            ...acc,
+            [key]: obj,
+          }
+        }, {})
+        
+        return {
+          ...acc,
+          [key]: obj,
+        }
+      }, {})
+      return obj
+    },
+    'week'(list) {
+      const obj = list.reduce((acc, cur) => {
+        const dateObj = cur.dateObj
+        const key = `${dateObj.year}${dateObj.month}${dateObj.week}`
+        return {
+          ...acc,
+          [key]: [
+            ...(acc[key] || []),
+            cur,
+          ],
+        }
+      }, {})
+      console.log(`month-week-day`, obj)
+      return obj
+    },
+  }
+
+  const handle = (handleObj)[`week` || tag]
+  const res = handle ? handle(list) : new Error(`不支持的标记`);
+  // console.log(`res`, JSON.stringify(res, null, 2))
+  console.log(`res`, res)
+  jsonToMd({tag, json: res, showNew})
+}
+
+function jsonToMd({tag = `month`, json = {}, showNew = true}) {
+  const handleObj =  {
+    'month'(json) {
+    },
+    'month-week'(json) {
+    },
+    'month-week-day'(json) {
+
+    },
+    'week'(json) {
+      return Object.entries(json).map(([key, val], index) => ({
+        key,
+        val,
+      })).sort(sort(showNew, `key`)).map(item => {
+        return [
+          `## ${item.key.replace(/(\d{4})(\d{2})(\d)/, `$1年$2月 第$3周`)}`,
+          ...item.val.sort(sort(showNew, `timeStamp`)).map(valItem => {
+            return `- ${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
+              valItem.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
+            }`
+          })
+        ].join(`\n`)
+      }).join(`\n\n`)
+    },
+  }
+
+  const handle = (handleObj)[`week` || tag]
+  const res = handle ? handle(json) : new Error(`不支持的标记`);
+  
+  require(`fs`).writeFileSync(`./res.md`, res)
+  console.log(`jsonToMd`, res)
+}
+
+function sort(showNew, key) {
+  return (a, b) =>  showNew ? (b[key] - a[key]) : (a[key] - b[key])
 }
