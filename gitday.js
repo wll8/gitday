@@ -151,13 +151,14 @@ function print(...arg) {
  */
 function toMd({tag = `month`, list = [], showNew = true}){
   list = list.map(obj => { // 先把每个类型的时间取出来方便使用
-    obj.timeStamp = new Date(obj.date).getTime()
+    const date = new Date(obj.date)
+    obj.timeStamp = date.getTime()
     obj.dateObj = {
       year: dateFormater(obj.date, `YYYY`),
       month: dateFormater(obj.date, `MM`),
       day: dateFormater(obj.date, `DD`),
-      week: Math.ceil(new Date(obj.date).getDate() / 7), // 第几周
-      weekDay: new Date(obj.date).getDay(), // 星期几
+      week: Math.ceil((date.getDate() + 6 - date.getDay()) / 7), // 第几周
+      weekDay: date.getDay(), // 星期几
     }
     return obj
   }).sort(sort(showNew, `timeStamp`))
