@@ -1,5 +1,5 @@
 # gitday
-以作者及日期查询 git提交日志, 并进行统计和格式化.
+读取 git log 的数据生成类似月报/周报/日报的 markdown  
 
 ## 体验或安装
 ``` sh
@@ -10,61 +10,47 @@ npm i -g wll8/gitday && gitday --help
 ## 参数:
 
 ``` txt
-name=@all 
-作者名称, 默认为当前项目配置的名称, @all 不限
+--help 显示使用方法
+--author=[作者名称] 默认为 git config user.name 的值  
+--after=[时间范围] 默认为 --x-template 的最大标志日期, 例如 month-week 则自动取最近一个月. 支持 git 的参数形
+式
+--x-template=[格式模板] 默认 week, 支持 month/week/day 或其组合
 
-date=@all|@-1... 
-查询日期, 默认为今天, @all 不限; @-1 前1天; @-2 前2天...
+示例:
 
-format=line|yaml|json 
-输出格式
+gitday --x-template=month
+## 2021年01月
+- commitMsg
+- commitMsg
 
---help 
-显示使用方法
+gitday --x-template=month-week
+## 2021年01月
+### 第1周
+- commitMsg
+- commitMsg
 
---all 
-是否忽略所有条件, 查询所有
+gitday --x-template=month-week-day
+## 2021年01月
+### 第1周
+#### 21日 星期1
+- commitMsg
+- commitMsg
 
---partake 
-忽略所有条件, 查询所有成员的参与度
+gitday --x-template=week
+## 2021年01月 第1周
+- commitMsg
+- commitMsg
 
---complete 
-以完整模式输出, 显示完整的 commitId, 且不排除 Merge 类型的提交
-``` 
+gitday --x-template=week-day
+## 2021年01月 第1周
+### 21日 星期1
+- commitMsg
+- commitMsg
 
-
-## 示例:
-
-``` sh
-gitday # 今天你做了什么?
-gitday name=小明 # 今天小明做了什么?
-gitday date=@-1 # 昨天你做了什么?
-gitday name=小明 date=@-1 # 昨天小明做了什么?
-gitday date=@-1 format=yaml # 使用 yaml 格式输出, 昨天你做了什么?
-gitday name=小明 date=2019-09-09 # 2019-09-09 小明做了什么?
-gitday --all --partake # 统计这个项目中所有开发人员的参与情况?
-```
-
-查看今天的提交记录
-``` sh
-$> qs gitday
-1: 14:36 doc: 体验或安装
-2: 14:01 fix: #!/usr/bin/env node
-3: 13:50 feat(cli): gitday
-``` 
-
-统计项目中所有开发人员的参与情况, * 号马赛克~
-可以清晰看到, 排在第一的成员开发了至少两个月，提交了 339 次代码。
-``` sh
-$> gitday --all --partake
-x** <da***@gmail.com> | day: 55 | commit: 339:
-h**** <f******@gmail.com> | day: 16 | commit: 38:
-w** <wa******o@******.com> | day: 2 | commit: 7:
-S****** <s******@163.com> | day: 1 | commit: 1:
-wl** <x***@gmail.com> | day: 1 | commit: 4:
-ch**** <wa**@****.com> | day: 1 | commit: 1:
-k** <zh**@******.com> | day: 5 | commit: 7:
-Y** <1522****@163.com> | day: 4 | commit: 5:
+gitday --x-template=day
+## 2021年01月24日
+- commitMsg
+- commitMsg
 ```
 
 ## 注
