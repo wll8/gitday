@@ -2,152 +2,88 @@
 
 // https://git-scm.com/docs/git-log
 const cp = require('child_process')
-const json2yaml = require(absPath('./json2yaml.js'))
 const fs = require('fs')
 const argv = parseArgv()
 const query = {
-  help: argv['--help'], // 显示帮助信息
-  name: argv.name || execSync(`git config user.name`), // 作者名称, 默认为当前项目配置的名称
-  date: argv.date || dateFormater(new Date(), `YYYY-MM-DD`), // 查询日期, 默认为今天
-  all: argv['--all'], // 是否忽略所有条件, 查询所有
-  partake: argv['--partake'], // 忽略所有条件, 查询所有成员的参与度
-  format: argv.format || 'line', // 输出格式: line | yaml | json
-  complete: argv['--complete'], // 以完整模式输出, 显示完成的 commitId, 且不排除 Merge 类型的提交
+  '--help': argv[`--help`],
+  '--author': argv[`--author`] || execSync(`git config user.name`),
+  '--x-template': argv[`--x-template`] || `week`,
+  '--after': argv[`--after`],
 }
 
 { // 关联参数特殊处理
-  if(query.help) {
-    const cliName = 'gitday' // todo rename to codelog
+  if(query['--help']) {
+    const cliName = `gitday`
     print(
 `
--- month
-## 2021年01月
-- commitNsg
-- commitNsg
-
--- month-week
-## 2021年01月
-### 第1周
-- commitNsg
-- commitNsg
-
--- month-week-day
-## 2021年01月
-### 第1周
-#### 礼拜1
-- commitNsg
-- commitNsg
-
--- week
-## 2021年01月 第1周
-- commitNsg
-- commitNsg
-
--- week-day
-## 2021年01月 第1周
-### 礼拜1
-- commitNsg
-- commitNsg
-
--- day
-## 2021年01月24日
-- commitNsg
-- commitNsg
-
-
-
-
-以作者及日期为条件，进行日志查询、统计和格式化.
+读取 git log 的数据生成类似月报/周报/日报的 markdown 文档.
 
 参数:
 
-name=@all 作者名称, 默认为当前项目配置的名称, @all 不限
-date=@all|@-1... 查询日期, 默认为今天, @all 不限; @-1 前1天; @-2 前2天...
-format=line|yaml|json 输出格式
 --help 显示使用方法
---all 是否忽略所有条件, 查询所有
---partake 忽略所有条件, 查询所有成员的参与度
---complete 以完整模式输出, 显示完整的 commitId, 且不排除 Merge 类型的提交
+name=[作者名称] 默认为 git config user.name 的值
+date=[时间范围] 默认为 tag 的最大标志日期, 例如 month-week 则自动取最近一个月. 支持 git 
+tag=[格式模板] 默认 week, 支持 month/week/day 或其组合
 
 示例:
 
-${cliName} # 今天你做了什么?
-${cliName} name=小明 # 今天实习生做了什么?
-${cliName} date=@-1 # 昨天你做了什么?
-${cliName} date=@-1 format=yaml # 使用 yaml 格式输出, 昨天你做了什么?
-${cliName} name=小明 date=@-1 # 昨天小明做了什么?
-${cliName} name=小明 date=2019-09-09 # 2019-09-09 小明做了什么?
-${cliName} --all --partake # 统计这个项目中所有开发人员的参与情况?
+${cliName} --x-template=month
+## 2021年01月
+- commitMsg
+- commitMsg
 
--month
--week
--day
--支持组合, 例如 week-day
+${cliName} --x-template=month-week
+## 2021年01月
+### 第1周
+- commitMsg
+- commitMsg
+
+${cliName} --x-template=month-week-day
+## 2021年01月
+### 第1周
+#### 礼拜1
+- commitMsg
+- commitMsg
+
+${cliName} --x-template=week
+## 2021年01月 第1周
+- commitMsg
+- commitMsg
+
+${cliName} --x-template=week-day
+## 2021年01月 第1周
+### 礼拜1
+- commitMsg
+- commitMsg
+
+${cliName} --x-template=day
+## 2021年01月24日
+- commitMsg
+- commitMsg
 
 `)
     return
   }
 
-  query.partake && (query.format = 'yaml');
-  let findPast = query.date.match(/@-(\d+)/)
-  if(findPast) {
-    let newDate = new Date(Date.now() - Number(findPast[1]) * 24*60*60*1000)
-    let findDay = dateFormater(newDate, 'YYYY-MM-DD')
-    query.date = findDay
-  }
+  query['--after'] = query['--after'] || `1.${query['--x-template'].split(`-`).shift()}s`
 }
 
-const author = execSync(`git config user.name`) // 获取当前配置的 git 用户名
-const cmdRes = execSync(`git log --author="${author}" --all --decorate --since=1.months`) // --all 显示所有分支 --decorate 显示完整的提交分支
+/**
+git log
+
+--author 作者
+--all 显示所有分支
+--after=1.months 显示某个时间之后
+--no-merges 不包括 merges
+
+
+ */
+const cmdRes = execSync(`git log --author="${query[`--author`]}" --all --after="${query[`--after`]}" --no-merges`)
 const list = paserLogToList(cmdRes)
-console.log(`list`, list)
-toMd({list})
-process.exit()
-
-const filterList = list.filter(item => {
-  return (
-    (query.complete || !item.Merge) // 完整模式下不排除 Merge 类型的提交
-    && (
-      query.all
-      || (
-        (query.name.includes('@all') || item.Author.match(new RegExp(`^${query.name} <`)))
-        && (query.date.includes('@all') || item.Date.includes(query.date))
-      )
-    )
-  )
-})
-
-
-const obj = listToAuthorDay(filterList)
-
-if(query.partake) {
-  for (const key in obj) {
-    obj[key] = ''
-  }
-}
-
-const stringifyObj = JSON.stringify(obj, null, 2)
-
+const toMdRes = toMd({tag: query['--x-template'], list})
+print(toMdRes)
 
 process.exit()
-// fs.writeFileSync(absPath('./gitday.json'), stringifyObj)
-
-;({
-  json: () => print(stringifyObj),
-  yaml: () => print(json2yaml(stringifyObj)),
-  line: () => {
-    let hasMultiple = Object.keys(obj).length > 1
-    let line = filterList.reduce((all, item, index) => {
-      let time = dateFormater(item.Date, 'HH:mm')
-      return all
-        + `${index+1}: ${time} ` // 序号和时间
-        + `${hasMultiple ? item.Author.match(/(.*) </)[1] + ' ' : ''}` // 查询多个作者时输入作者名
-        + item.Msg // log 信息
-        + '\n'
-    }, '')
-    print(line)
-  },
-})[query.format]()
 
 function parseArgv() {
   return process.argv.slice(2).reduce((acc, arg) => {
@@ -157,52 +93,12 @@ function parseArgv() {
   }, {})
 }
 
-function listToAuthorDay(list) { // 转换 log list
-  let obj = {}
-  list.forEach((item, index, arr) => { // 按 Author >> Day 进行层级化
-    let key = item.Author
-    let day = dateFormater(item.Date, 'YYYY-MM-DD')
-    { // 设置 Author
-      (obj[key] || (obj[key] = {}))
-    }
-    { // push 每条记录到 day 中
-      (obj[key][day] || (obj[key][day] = [])).push(({
-        ...item,
-        Commit: query.complete ? item.Commit : item.Commit.slice(0, 7),
-        Author: query.complete ? item.Author : undefined,
-      }))
-    }
-  })
-
-  // 统计每个 key 下的内容, 并保存到 key 上
-  let objKey = Object.keys(obj)
-  for (let index = 0; index < objKey.length; index++) {
-    const author = objKey[index]
-    const authorObj = obj[author]
-    const authorObjKey = Object.keys(authorObj)
-    const authorObjKeyLength = authorObjKey.length
-    const newAuthorLabel = `${author} | day: ${authorObjKeyLength} | commit: ${list.filter(item => item.Author === author).length}`
-    obj[newAuthorLabel] = authorObj
-    delete obj[author]
-
-    for (let index = 0; index < authorObjKey.length; index++) {
-      const day = authorObjKey[index]
-      let newDayLabel = `${day} | week: ${new Date(day).getDay()} | commit: ${authorObj[day].length}`
-      obj[newAuthorLabel][newDayLabel] = authorObj[day]
-      delete authorObj[day]
-    }
-
-  }
-
-  return obj
-}
-
 function paserLogToList(str) { // 把 git log 的内容解析为数组
   str = `\n${str}`
   const tag = /\ncommit /
   const list = str.split(tag).filter(item => item.trim()).map(item => {
     const obj = {}
-    // obj.Raw = item
+    obj.raw = item
     obj.date = (dateFormater((item.match(/Date:(.*)/) || [])[1].trim(), 'YYYY-MM-DD HH:mm:ss'))
     obj.commit = (item.match(/(.*)\n/) || [])[1].trim()
     obj.author = (item.match(/Author:(.*)/) || [])[1].trim()
@@ -237,7 +133,7 @@ function absPath(file = '') {
 }
 
 function execSync(cmd) {
-  console.log([`>`, console.log(cmd)].join(`\n`))
+  print(`>`, cmd)
   return cp.execSync(cmd).toString().trim()
 }
 
@@ -261,11 +157,7 @@ function toMd({tag = `month`, list = [], showNew = true}){
       month: dateFormater(obj.date, `MM`),
       week: Math.ceil(new Date(obj.date).getDate() / 7),
       day: dateFormater(obj.date, `DD`),
-      weekDay: new Date(obj.date).getDay() + 1, // 礼拜n
-
-      // month: dateFormater(obj.date, `YYYY年MM月`),
-      // week: `${dateFormater(obj.date, `YYYY年MM月`)} 第${Math.ceil(new Date(obj.date).getDate() / 7)}周 礼拜${new Date(obj.date).getDay() + 1}` ,
-      // day: `${dateFormater(obj.date, `YYYY年MM月DD日`)}` ,
+      weekDay: new Date(obj.date).getDay(), // 礼拜n
     }
     return obj
   }).sort(sort(showNew, `timeStamp`))
@@ -326,29 +218,48 @@ function toMd({tag = `month`, list = [], showNew = true}){
   }
 
   const handle = (handleObj)[tag]
-  const res = handle ? handle(list) : new Error(`不支持的标记`);
-  // console.log(`res`, JSON.stringify(res, null, 2))
-  console.log(`res`, res)
 
-  function create({tag, list}) {
-    let oldTitle = ``
-    const str = list.map(item => {
-      const newTitle = tag.map(title => {
-        title = `({ year, month, week, day, weekDay }) => \`\n${title}\``
-        return eval.call(null, title)(item.dateObj)
-      } ).join(``)
-      let str = ``
-      if(oldTitle !== newTitle) {
-        oldTitle = newTitle
-        str = newTitle
-      }
-      return [str, `- ${item.date}`].filter(item => item).join(`\n`)
-    }).join(`\n`).trim()
-    return str
-  }
-  
+  const res = handle ? handle(list) : new Error(`不支持的标记`);
+  return res
 }
 
+
+/**
+ * 根据 title 标记输出 md
+ * @param {object} param0
+ * @param {array} param0.tag title 标志
+ * @param {array} param0.list log 数据
+ * @returns string
+ */
+function create({tag, list}) {
+  let oldTitle = ``
+  const str = list.map(item => {
+    const newTitle = tag.map(title => {
+      title = `({ year, month, week, day, weekDay }) => \`\n${title}\``
+      return eval.call(null, title)(item.dateObj)
+    } ).join(``)
+    let str = ``
+    if(oldTitle !== newTitle) {
+      oldTitle = newTitle
+      str = newTitle
+    }
+    return [
+      str,
+      `- ${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
+        item.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
+      }`
+    ].filter(item => item).join(`\n`)
+  }).join(`\n`).trim()
+  return str
+}
+
+
+/**
+ * 根据指定的 key 排序
+ * @param {boolean} showNew false 降序 true 升序
+ * @param {string} key 要排序的 key
+ * @returns function
+ */
 function sort(showNew, key) {
   return (a, b) =>  showNew ? (b[key] - a[key]) : (a[key] - b[key])
 }
