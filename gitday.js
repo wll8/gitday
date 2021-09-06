@@ -20,36 +20,36 @@ const query = {
     const cliName = 'gitday' // todo rename to codelog
     print(
 `
---month
+-- month
 ## 2021年01月
 - commitNsg
 - commitNsg
 
---month-week
+-- month-week
 ## 2021年01月
 ### 第1周
 - commitNsg
 - commitNsg
 
---month-week-day
+-- month-week-day
 ## 2021年01月
 ### 第1周
 #### 礼拜1
 - commitNsg
 - commitNsg
 
---week
+-- week
 ## 2021年01月 第1周
 - commitNsg
 - commitNsg
 
---week-day
+-- week-day
 ## 2021年01月 第1周
 ### 礼拜1
 - commitNsg
 - commitNsg
 
---day
+-- day
 ## 2021年01月24日
 - commitNsg
 - commitNsg
@@ -253,7 +253,7 @@ function print(...arg) {
  * @param {array} param0.list - 数据
  * @param {boolean} [param0.showNew = true] - 是否把新时间排到前面
  */
-function toMd({tag = `month`, list = [], showNew = true}){
+function toMd({tag = `day`, list = [], showNew = true}){
   list = list.map(obj => { // 先把每个类型的时间取出来方便使用
     obj.timeStamp = new Date(obj.date).getTime()
     obj.dateObj = {
@@ -268,128 +268,116 @@ function toMd({tag = `month`, list = [], showNew = true}){
       // day: `${dateFormater(obj.date, `YYYY年MM月DD日`)}` ,
     }
     return obj
-  })
+  }).sort(sort(showNew, `timeStamp`))
 
   const handleObj =  {
     'month'(list) {
-      const obj = list.reduce((acc, cur) => {
-        const dateObj = cur.dateObj
-        const key = `${dateObj.year}${dateObj.month}`
-        return {
-          ...acc,
-          [key]: [
-            ...(acc[key] || []),
-            cur,
-          ],
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
         }
-      }, {})
-      console.log(`month`, obj)
-      return obj
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
     },
     'month-week'(list) {
-      let obj = handleObj[`month`](list)
-      obj = Object.entries(obj).reduce((acc, [key, val]) => {
-        const obj = val.reduce((acc, cur) => {
-          const dateObj = cur.dateObj
-          const key = `${dateObj.week}`
-          return {
-            ...acc,
-            [key]: [
-              ...(acc[key] || []),
-              cur,
-            ],
-          }
-        }, {})
-        return {
-          ...acc,
-          [key]: obj,
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月`,
+          `\n### 第${week}周`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
         }
-      }, {})
-      return obj
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
     },
     'month-week-day'(list) {
-      let obj = handleObj[`month-week`](list)
-      obj = Object.entries(obj).reduce((acc, [key, val]) => {
-        obj = Object.entries(val).reduce((acc, [key, val]) => {
-          const obj = val.reduce((acc, cur) => {
-            const dateObj = cur.dateObj
-            const key = `${dateObj.weekDay}`
-            return {
-              ...acc,
-              [key]: [
-                ...(acc[key] || []),
-                cur,
-              ],
-            }
-          }, {})
-          return {
-            ...acc,
-            [key]: obj,
-          }
-        }, {})
-        
-        return {
-          ...acc,
-          [key]: obj,
+      console.log(`listlist`, list)
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week, weekDay} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月`,
+          `\n### 第${week}周`,
+          `\n#### 礼拜${weekDay}`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
         }
-      }, {})
-      return obj
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
     },
     'week'(list) {
-      const obj = list.reduce((acc, cur) => {
-        const dateObj = cur.dateObj
-        const key = `${dateObj.year}${dateObj.month}${dateObj.week}`
-        return {
-          ...acc,
-          [key]: [
-            ...(acc[key] || []),
-            cur,
-          ],
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月 第${week}周`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
         }
-      }, {})
-      console.log(`month-week-day`, obj)
-      return obj
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
+    },
+    'week-day'(list) {
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week, weekDay} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月 第${week}周`,
+          `\n## 礼拜${weekDay}`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
+        }
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
+    },
+    'day'(list) {
+      let oldTitle = ``
+      const str = list.map(item => {
+        const {year, month, week, day, weekDay} = item.dateObj
+        const newTitle = [
+          `\n## ${year}年${month}月${day}日`,
+        ].join(``)
+        let str = ``
+        if(oldTitle !== newTitle) {
+          oldTitle = newTitle
+          str = newTitle
+        }
+        return [str, `- ${item.date}`].filter(item => item).join(`\n`)
+      }).join(`\n`).trim()
+      return str
     },
   }
 
-  const handle = (handleObj)[`week` || tag]
+  const handle = (handleObj)[tag]
   const res = handle ? handle(list) : new Error(`不支持的标记`);
   // console.log(`res`, JSON.stringify(res, null, 2))
   console.log(`res`, res)
-  jsonToMd({tag, json: res, showNew})
-}
-
-function jsonToMd({tag = `month`, json = {}, showNew = true}) {
-  const handleObj =  {
-    'month'(json) {
-    },
-    'month-week'(json) {
-    },
-    'month-week-day'(json) {
-
-    },
-    'week'(json) {
-      return Object.entries(json).map(([key, val], index) => ({
-        key,
-        val,
-      })).sort(sort(showNew, `key`)).map(item => {
-        return [
-          `## ${item.key.replace(/(\d{4})(\d{2})(\d)/, `$1年$2月 第$3周`)}`,
-          ...item.val.sort(sort(showNew, `timeStamp`)).map(valItem => {
-            return `- ${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
-              valItem.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
-            }`
-          })
-        ].join(`\n`)
-      }).join(`\n\n`)
-    },
-  }
-
-  const handle = (handleObj)[`week` || tag]
-  const res = handle ? handle(json) : new Error(`不支持的标记`);
-  
-  require(`fs`).writeFileSync(`./res.md`, res)
-  console.log(`jsonToMd`, res)
 }
 
 function sort(showNew, key) {
