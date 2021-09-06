@@ -21,9 +21,9 @@ const query = {
 参数:
 
 --help 显示使用方法
-name=[作者名称] 默认为 git config user.name 的值
-date=[时间范围] 默认为 tag 的最大标志日期, 例如 month-week 则自动取最近一个月. 支持 git 
-tag=[格式模板] 默认 week, 支持 month/week/day 或其组合
+--author=[作者名称] 默认为 git config user.name 的值
+--after=[时间范围] 默认为 --x-template 的最大标志日期, 例如 month-week 则自动取最近一个月. 支持 git 的参数形式
+--x-template=[格式模板] 默认 week, 支持 month/week/day 或其组合
 
 示例:
 
