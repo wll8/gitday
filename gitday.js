@@ -41,7 +41,7 @@ ${cliName} --x-template=month-week
 ${cliName} --x-template=month-week-day
 ## 2021年01月
 ### 第1周
-#### 礼拜1
+#### 21日 星期1
 - commitMsg
 - commitMsg
 
@@ -52,7 +52,7 @@ ${cliName} --x-template=week
 
 ${cliName} --x-template=week-day
 ## 2021年01月 第1周
-### 礼拜1
+### 21日 星期1
 - commitMsg
 - commitMsg
 
@@ -155,9 +155,9 @@ function toMd({tag = `month`, list = [], showNew = true}){
     obj.dateObj = {
       year: dateFormater(obj.date, `YYYY`),
       month: dateFormater(obj.date, `MM`),
-      week: Math.ceil(new Date(obj.date).getDate() / 7),
       day: dateFormater(obj.date, `DD`),
-      weekDay: new Date(obj.date).getDay(), // 礼拜n
+      week: Math.ceil(new Date(obj.date).getDate() / 7), // 第几周
+      weekDay: new Date(obj.date).getDay(), // 星期几
     }
     return obj
   }).sort(sort(showNew, `timeStamp`))
@@ -185,7 +185,7 @@ function toMd({tag = `month`, list = [], showNew = true}){
         tag: [
           '## ${year}年${month}月',
           '### 第${week}周',
-          '#### 礼拜${weekDay}',
+          '#### ${day}日 星期${weekDay}',
         ],
         list,
       })
@@ -202,7 +202,7 @@ function toMd({tag = `month`, list = [], showNew = true}){
       return create({
         tag: [
           '## ${year}年${month}月 第${week}周',
-          '### 礼拜${weekDay}',
+          '### ${day}日 星期${weekDay}',
         ],
         list,
       })
@@ -232,23 +232,22 @@ function toMd({tag = `month`, list = [], showNew = true}){
  * @returns string
  */
 function create({tag, list}) {
-  let oldTitle = ``
+  let oldTitle = []
   const str = list.map(item => {
-    const newTitle = tag.map(title => {
-      title = `({ year, month, week, day, weekDay }) => \`\n${title}\``
-      return eval.call(null, title)(item.dateObj)
-    } ).join(``)
-    let str = ``
-    if(oldTitle !== newTitle) {
-      oldTitle = newTitle
-      str = newTitle
-    }
-    return [
-      str,
+    let titleStr = []
+    const newTitle = tag.map((title, index) => {
+      title = eval.call(null, `({ year, month, week, day, weekDay }) => \`\n${title}\``)(item.dateObj)
+      titleStr[index] = oldTitle[index] === title ? `` : title
+      return title
+    } )
+    const res = [
+      titleStr.join(``),
       `- ${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
         item.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
       }`
     ].filter(item => item).join(`\n`)
+    oldTitle = newTitle
+    return res
   }).join(`\n`).trim()
   return str
 }
