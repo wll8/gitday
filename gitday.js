@@ -158,7 +158,7 @@ function toMd({tag = `month`, list = [], showNew = true}){
       month: dateFormater(obj.date, `MM`),
       day: dateFormater(obj.date, `DD`),
       week: Math.ceil((date.getDate() + 6 - date.getDay()) / 7), // 第几周
-      weekDay: date.getDay(), // 星期几
+      weekDay: [`日`, `一`, `二`, `三`, `四`, `五`, `六`][date.getDay()], // 星期几
     }
     return obj
   }).sort(sort(showNew, `timeStamp`))
