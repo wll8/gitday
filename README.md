@@ -1,59 +1,48 @@
 # gitday
 读取 git log 的数据生成类似月报/周报/日报的 markdown  
 
-## 体验或安装
+## 使用
 ``` sh
-npx github:wll8/gitday --help
-npm i -g wll8/gitday && gitday --help
-```
+# 安装
+npm i -g wll8/gitday
 
-## 参数:
-
-``` txt
---help 显示使用方法
---author=[作者名称] 默认为 git config user.name 的值  
---after=[时间范围] 默认为 --x-template 的最大标志日期, 例如 month-week 则自动取最近一个月. 支持 git 的参数形
-式
---x-template=[格式模板] 默认 week, 支持 month/week/day 或其组合
-
-示例:
-
-gitday --x-template=month
-## 2021年01月
-- commitMsg
-- commitMsg
-
-gitday --x-template=month-week
-## 2021年01月
-### 第1周
-- commitMsg
-- commitMsg
-
+# 例: 以 月/周/天 的形式导出报告
 gitday --x-template=month-week-day
-## 2021年01月
-### 第1周
-#### 21日 星期1
-- commitMsg
-- commitMsg
 
-gitday --x-template=week
-## 2021年01月 第1周
-- commitMsg
-- commitMsg
-
-gitday --x-template=week-day
-## 2021年01月 第1周
-### 21日 星期1
-- commitMsg
-- commitMsg
-
-gitday --x-template=day
-## 2021年01月24日
-- commitMsg
-- commitMsg
+# 查看使用说明
+gitday --help
 ```
 
 ## 注
 - 请在 git 仓库目录下使用本程序。
 - 本程序使用 git log 的信息进行分析, 不会对你的项目产生任何影响。
 - 没有第三方依赖。
+
+## todo
+- [ ] feat: 支持输出为 html 以方便携带格式进入邮件
+- [x] feat: 支持 --x-debug 模式, 以确定输出是否正确
+- [ ] feat: 格式化输出
+  - 每个 commit 前插入一个空行
+  - 多行 commit 消息时再每行后面添加两个空格, 这样默认 markdown 才会显示换行效果
+  - 移除 commit title 与 body 之前的空行
+  - 移除 body 后面多于的空行
+  - 合并两个空行为一个
+  - 转换 msg 提交标志, 例如转换 `fix(client): xxx` 为 `修复 client 中的缺陷: xxx`
+    ```
+    # 主要type
+    feat:     增加新功能
+    fix:      修复bug
+
+    # 特殊type
+    docs:     只改动了文档相关的内容
+    style:    不影响代码含义的改动，例如去掉空格、改变缩进、增删分号
+    build:    构造工具的或者外部依赖的改动，例如webpack，npm
+    refactor: 代码重构时使用
+    revert:   执行git revert打印的message
+
+    # 暂不使用type
+    test:     添加测试或者修改现有测试
+    perf:     提高性能的改动
+    ci:       与CI（持续集成服务）有关的改动
+    chore:    不修改src或者test的其余修改，例如构建过程或辅助工具的变动
+    ```

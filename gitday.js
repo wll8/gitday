@@ -8,6 +8,7 @@ const query = {
   '--help': argv[`--help`],
   '--author': argv[`--author`] || execSync(`git config user.name`),
   '--x-template': argv[`--x-template`] || `week`,
+  '--x-debug': argv[`--x-debug`] || false,
   '--after': argv[`--after`],
 }
 
@@ -243,7 +244,7 @@ function create({tag, list}) {
     } )
     const res = [
       titleStr.join(``),
-      `- ${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
+      `- ${debug({item})}${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
         item.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
       }`
     ].filter(item => item).join(`\n`)
@@ -262,4 +263,12 @@ function create({tag, list}) {
  */
 function sort(showNew, key) {
   return (a, b) =>  showNew ? (b[key] - a[key]) : (a[key] - b[key])
+}
+
+function debug({item}) {
+  if(query[`--x-debug`]) {
+    return `${item.date} ${item.commit} ${item.author}\n  `
+  } else {
+    return ``
+  }
 }
