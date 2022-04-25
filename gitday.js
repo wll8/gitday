@@ -62,7 +62,7 @@ ${cliName} --x-template=day
 - commitMsg
 
 `)
-    return
+    process.exit()
   }
 
   query['--after'] = query['--after'] || `1.${query['--x-template'].split(`-`).shift()}s`
