@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "",
   "bin": {
-    "gitday": "gitday.js"
+    "gitday": "index.js"
   },
   "keywords": [],
   "author": "xw",
