@@ -19,7 +19,39 @@ gitday --help
 - 没有第三方依赖。
 
 ## todo
+- [ ] feat: 支持报告配置, 用于应对多个项目或周报
+``` js
+config = {
+  report: [
+    {
+      select: `个人`, // 报告标志, 可以使用不同的标志生成不同的周报
+      title: `{{user.name}}的周报({{time.year}}年{{time.month}}月，第{{time.week}}周)`, // 报告标题, 例 # 张三的周报(2022年07月，第5周)
+      layout: `repository-time`, // 布局方式 repository-time 先仓库后时间, time-repository 行时间后仓库
+      author: [`wll8`], // 作者名称
+      authorName: `张三`, // 实际输出到报告中的名称, 例如 git 用户名和报告中所需姓名不同时
+      template: `week`, // 所用模板, 默认 week, 支持 month/week/day 或其组合
+      useFile: `./个人项目周小结.md`, // 使用文件模板, 相对于配置文件目录
+      outFile: [`./个人项目周小结.html`], // 输出文件, 支持 .md .word .html, 相对于运行目录
+      rootLevel: 1, // 从多少个#号开始表示第一级标题
+      repository: [ // 仓库配置
+        {
+          path: `D:/git2/qs-cli`, // 绝对路径
+          name: `命令行助手`, // 仓库名
+        },
+        {
+          path: `D:/git2/mockm`,
+          name: `接口联调器`,
+        },
+      ],
+    },
+  ],
+}
+```
 - [ ] feat: 支持输出为 html 以方便携带格式进入邮件
+- [ ] feat: 使用硬性时间节点, 而不是最近时间之后
+  - 例如当天日期是7月26日, 周二, 运行以命令 `gitday --x-template=week`
+    - 变更前查询 `最近7天`, 即 7月20日到7月26日 的提交记录.
+    - 变更后查询 `本周`, 即 7月25日到7月26日 的提交记录.
 - [x] feat: 支持 --x-debug 模式, 以确定输出是否正确
 - [ ] feat: 支持输出到给定的模板文件中
 - [ ] feat: 格式化输出
