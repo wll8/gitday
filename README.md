@@ -21,6 +21,7 @@ gitday --help
 ## todo
 - [ ] feat: 支持输出为 html 以方便携带格式进入邮件
 - [x] feat: 支持 --x-debug 模式, 以确定输出是否正确
+- [ ] feat: 支持输出到给定的模板文件中
 - [ ] feat: 格式化输出
   - 每个 commit 前插入一个空行
   - 多行 commit 消息时再每行后面添加两个空格, 这样默认 markdown 才会显示换行效果
