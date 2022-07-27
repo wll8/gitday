@@ -1,4 +1,5 @@
 const cp = require('child_process')
+const moment = require('moment')
 
 function removeLeft(str) {
   const lines = str.split(`\n`)
@@ -16,7 +17,24 @@ function removeLeft(str) {
 function print(...arg) {
   return console.log(...arg)
 }
-  
+
+/**
+ * 获取所使用的 git log 命令
+ * @returns string
+ */
+function logLine({query}) {
+  const str = [
+    `git`,
+    `log`,
+    `--all`,
+    `--after=${global.query['--after']}`,
+    `--before=${global.query['--before']}`,
+    `--no-merges`,
+    `--format=fuller`,
+  ].join(` `)
+  return str
+}
+
 function help({cliName}) {
   return removeLeft(`
     读取 git log 的数据生成类似月报/周报/日报的 markdown 文档.
@@ -67,26 +85,14 @@ function help({cliName}) {
   `)
 }
 
-function execSync(cmd) {
+function execSync(cmd, option) {
   print(`>`, cmd)
-  return cp.execSync(cmd).toString().trim()
+  return cp.execSync(cmd, option).toString().trim()
 }
 
 function dateFormater(t, formater) { // 时间格式化
-  let date = t ? new Date(t) : new Date(),
-    Y = date.getFullYear() + '',
-    M = date.getMonth() + 1,
-    D = date.getDate(),
-    H = date.getHours(),
-    m = date.getMinutes(),
-    s = date.getSeconds();
-  return formater.replace(/YYYY|yyyy/g, Y)
-    .replace(/YY|yy/g, Y.substr(2, 2))
-    .replace(/MM/g, (M < 10 ? '0' : '') + M)
-    .replace(/DD/g, (D < 10 ? '0' : '') + D)
-    .replace(/HH|hh/g, (H < 10 ? '0' : '') + H)
-    .replace(/mm/g, (m < 10 ? '0' : '') + m)
-    .replace(/ss/g, (s < 10 ? '0' : '') + s)
+  let date = t ? new Date(t) : new Date()
+  return moment(date).format(formater)
 }
 
 function parseArgv() {
@@ -97,20 +103,61 @@ function parseArgv() {
   }, {})
 }
 
-function paserLogToList(str) { // 把 git log 的内容解析为数组
+function handleMsg(rawMsg) {
+  let msg = ((rawMsg.match(/(\n\n)([\s\S]+?$)/) || [])[2] || ``)
+  msg = removeLeft(msg)
+  if(global.query[`--x-message-body`] === `none`) { // 不使用 body
+    msg = msg.split(`\n`)[0]
+  }
+  if(global.query[`--x-message-body`] === `compatible`) { // 当 body 含有可能破坏报告的内容时不使用
+    const [one, ...body] = msg.split(`\n`)
+    if(
+      // 含有 body 时
+      (body.filter(item => item.trim()) > 1)
+      // body 中有特殊样式时
+      && body.some(item => (
+        // 含有 # 标题
+        item.match(/^#{1,6}\s+/)
+        // 含有分割线
+        // || item.match(/^#{1,6}\s+/).split(`-`).filter(item => item).length === 0
+      ))
+    ) {
+      msg = one
+    }
+  }
+  if(global.query[`--x-message-body`] === `raw`) { // 原样使用 body
+    msg = msg
+  }
+  msg = msg.trim()
+  return msg
+}
+
+/**
+ * 把 git log 的内容解析为数组
+ * @param {*} str 
+ * @returns 
+ */
+function paserLogToList(str) {
   str = `\n${str}`
   const tag = /\ncommit /
-  const list = str.split(tag).filter(item => item.trim()).map(item => {
+  const list = str.split(tag).filter(item => item.trim()).map(rawMsg => {
+    rawMsg = `commit ${rawMsg}`
     const obj = {}
-    obj.raw = item
-    obj.date = (dateFormater((item.match(/Date:(.*)/) || [])[1].trim(), 'YYYY-MM-DD HH:mm:ss'))
-    obj.commit = (item.match(/(.*)\n/) || [])[1].trim()
-    obj.author = (item.match(/Author:(.*)/) || [])[1].trim()
-    obj.msg = (item.match(/    [\s\S]+?$/) || [])[0] // 去除 msg 前面的多于空格
-      .split('\n')
-      .reduce((all, str) => all + (str.replace('    ', '\n')), '')
-      .trim()
+    obj.raw = rawMsg
+    // 使用 CommitDate 而不是 AuthorDate
+    // CommitDate: 被再次修改的时间或作为补丁使用的时间
+    obj.date = (dateFormater((rawMsg.match(/CommitDate:(.*)/) || [])[1].trim(), 'YYYY-MM-DD HH:mm:ss'))
+    // commit sha
+    obj.commit = (rawMsg.match(/(.*)\n/) || [])[1].trim()
+    // 作者及邮箱
+    obj.author = (rawMsg.match(/Author:(.*)/) || [])[1].trim()
+    obj.msg = handleMsg(rawMsg)
     return obj
+  }).filter(item => {
+    return (
+      moment(item.date).isSameOrBefore(query['--before'])
+      && moment(item.date).isSameOrAfter(query['--after'])
+    )
   })
   return list
 }
@@ -132,7 +179,7 @@ function sort(showNew, key) {
  * @param {array} param0.list log 数据
  * @returns string
  */
- function create({tag, list}) {
+function create({tag, list}) {
   let oldTitle = []
   const str = list.map(item => {
     let titleStr = []
@@ -147,6 +194,7 @@ function sort(showNew, key) {
         item.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
       }`
     ].filter(item => item).join(`\n`)
+    console.log({newTitle})
     oldTitle = newTitle
     return res
   }).join(`\n`).trim()
@@ -242,7 +290,21 @@ function toMd({tag = `month`, list = [], showNew = true}){
   return res
 }
 
+/**
+ * 获取模板对应的时间
+ */
+function handleLogTime({query}) {
+  const tag = query['--x-template'].split(`-`).shift() // month week day
+  // 处理 moment 是以周日作为每周的开始, 但现实中是以周一作为开始
+  const offset = tag === `week` ? {day: 1} : {}
+  const after = moment().startOf(tag).add(offset).format(`YYYY-MM-DD`)
+  const before = moment().endOf(tag).add(offset).format(`YYYY-MM-DD`)
+  return {after, before}
+}
+
 module.exports = {
+  handleLogTime,
+  logLine,
   toMd,
   create,
   sort,

@@ -5,7 +5,13 @@
   "bin": {
     "gitday": "index.js"
   },
+  "scripts": {
+    "dev": "node index.js --x-message-body=none --after=2022-07-18 --before=2022-07-24"
+  },
   "keywords": [],
   "author": "xw",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.29.4"
+  }
 }
