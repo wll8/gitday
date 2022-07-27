@@ -37,7 +37,7 @@ console.log(`query`, query)
 global.query = query
 
 { // 使用配置
-  const config = require(`./config/index.js`)
+  const config = require(`./config/cfg.js`)
   const reportList = config.report.filter(item => global.query[`--select`].includes(item.select))
   reportList.forEach(reportItem => {
     const repository = reportItem.repository.map(repositoryItem => {
