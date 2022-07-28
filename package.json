@@ -6,12 +6,15 @@
     "gitday": "index.js"
   },
   "scripts": {
-    "dev": "node index.js --x-message-body=none --after=2022-07-18 --before=2022-07-24"
+    "dev": "node index.js --template=week --messageBody=none --after=2022-06-18 --before=2022-07-24 --select=test"
   },
+  "homepage": "https://github.com/wll8/gitday",
   "keywords": [],
   "author": "xw",
   "license": "ISC",
   "dependencies": {
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "mustache": "^4.2.0",
+    "opener": "^1.5.2"
   }
 }

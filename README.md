@@ -6,17 +6,85 @@
 # 安装
 npm i -g wll8/gitday
 
-# 例: 以 月/周/天 的形式导出报告
-gitday --x-template=month-week-day
+# 生成月/周报
+gitday
+
+# 生成周报
+gitday --template=week
 
 # 查看使用说明
 gitday --help
+
+# 查看版本号
+gitday -v
+
+# 打开配置文件所在位置
+gitday --config
 ```
 
-## 注
-- 请在 git 仓库目录下使用本程序。
-- 本程序使用 git log 的信息进行分析, 不会对你的项目产生任何影响。
-- 没有第三方依赖。
+## 选项
+这些选项来自配置文件，你可以使用 `gitday --config` 打开配置文件所在位置，也可以在使用时通过命令行设置报告参数, 例如 `gitday --author=wll8` 。
+
+- select
+  - [x] 你可以使用配置文件保存多个报告，批量生成它们，多个使用逗号分割。
+  - 可选值
+    - default 程序默认的报告配置
+    - 其他自己在配置文件中添加的模板标志
+  - 默认值 `default`
+- layout
+  - [ ] 布局方式
+  - 可选值
+    - repository-time 先仓库后时间
+    - time-repository 先时间后仓库
+  - 默认值 `repository-time`
+- author
+  - [x] 指定要生成报告的 git 用户名
+  - 可选值
+    - `*` 不过滤用户名
+    - 其他你自己指定的用户名，多个使用逗号分割
+  - 默认值 `当前 git 用户`, 即 `git config user.name` 的值
+- authorName
+  - [x] 实际输出到报告中的名称, 例如 git 用户名和报告中所需姓名不同时
+  - 默认值 `当前 git 用户`
+- template
+  - [ ] 报告的时间编排方式
+  - 可选值
+    - month
+    - month-week
+    - month-week-day
+    - week
+    - week-day
+    - day
+  - 默认值 `month-week`
+- messageBody
+  - 如何处理 git commit message 的 body 部分, 由于它的内容不可控, 可能会破坏报告
+  - 可选值
+    - raw 原样使用
+    - none 不使用
+    - compatible 当含有可能破坏报告的内容时不使用
+  - 默认值: `compatible`
+- useFile
+ - [x] 使用文件模板, 相对于配置文件目录
+  - 默认值: `./default.template.md`
+- after
+  - 开始时间, YYYY-MM-DD 格式
+  - 默认值 `根据 template 转换`
+- before
+  - 结束时间, YYYY-MM-DD 格式
+  - 默认值 `根据 template 转换`
+- outFile
+  - [ ] 输出文件, 支持 .md .html .pdf .jpeg .word .xlsx, 相对于运行目录
+  - 默认值: `./gitday.out.md`
+- insertFile
+  - [ ] 插入文件, 相对于运行目录
+  - 默认值: `./todo.md`
+- rootLevel
+  - [x] 从多少个#号开始表示生成内容中最高级别标题, 不包含文档根结点标题, 根节点标题的级别应在 report.title 中添加
+  - 默认值: 2
+- repository
+  - [x] 从哪些仓库中生成报告, 多个使用逗号分割
+  - 默认值: 当前仓库
+
 
 ## todo
 - [ ] feat: 如果只有一个时间结点时, 则不显示它. 比如下面内容, 当为本周周报时, 重复显示 `2022年07月 第4周` 是没有意义的.
@@ -32,44 +100,17 @@ gitday --help
 
   ```
 - [ ] fix: 应根据 CommitDate 移除不在指定范围内的 commit, 避免出现查这周但显示前几周的现象
-- [ ] feat: 使用 --x-message-body 选项处理 message body 部分, 它的内容不可控制, 可能会破坏报告
+- [ ] feat: 使用 --messageBody 选项处理 message body 部分, 它的内容不可控制, 可能会破坏报告
   - raw 原样使用
   - none 不使用
   - compatible 默认, 当含有可能破坏报告的内容时不使用
 - [ ] feat: 支持报告配置, 用于应对多个项目或周报
-``` js
-config = {
-  report: [
-    {
-      select: `个人`, // 报告标志, 可以使用不同的标志生成不同的周报
-      title: `{{user.name}}的周报({{time.year}}年{{time.month}}月，第{{time.week}}周)`, // 报告标题, 例 # 张三的周报(2022年07月，第5周)
-      layout: `repository-time`, // 布局方式 repository-time 先仓库后时间, time-repository 行时间后仓库
-      author: [`wll8`], // 作者名称
-      authorName: `张三`, // 实际输出到报告中的名称, 例如 git 用户名和报告中所需姓名不同时
-      template: `week`, // 所用模板, 默认 week, 支持 month/week/day 或其组合
-      useFile: `./个人项目周小结.md`, // 使用文件模板, 相对于配置文件目录
-      outFile: [`./个人项目周小结.html`], // 输出文件, 支持 .md .word .html, 相对于运行目录
-      rootLevel: 1, // 从多少个#号开始表示第一级标题
-      repository: [ // 仓库配置
-        {
-          path: `D:/git2/qs-cli`, // 绝对路径
-          name: `命令行助手`, // 仓库名
-        },
-        {
-          path: `D:/git2/mockm`,
-          name: `接口联调器`,
-        },
-      ],
-    },
-  ],
-}
-```
 - [ ] feat: 支持输出为 html 以方便携带格式进入邮件
 - [ ] feat: 使用硬性时间节点, 而不是最近时间之后
-  - 例如当天日期是7月26日, 周二, 运行以命令 `gitday --x-template=week`
+  - 例如当天日期是7月26日, 周二, 运行以命令 `gitday --template=week`
     - 变更前查询 `最近7天`, 即 7月20日到7月26日 的提交记录.
     - 变更后查询 `本周`, 即 7月25日到7月26日 的提交记录.
-- [x] feat: 支持 --x-debug 模式, 以确定输出是否正确
+- [x] feat: 支持 --debug 模式, 以确定输出是否正确
 - [ ] feat: 支持输出到给定的模板文件中
 - [ ] feat: 格式化输出
   - 每个 commit 前插入一个空行

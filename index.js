@@ -1,64 +1,70 @@
 #!/usr/bin/env node
 
-const moment = require('moment')
 const util = require(`./util.js`)
+util.init()
 const {
   parseArgv,
   execSync,
   help,
   paserLogToList,
   toMd,
-  print,
 } = util
 const argv = parseArgv()
-const query = {
-  '--help': argv[`--help`],
-  '--author': argv[`--author`] || execSync(`git config user.name`),
-  '--x-template': argv[`--x-template`] || `week`,
-  '--x-debug': argv[`--x-debug`] || false,
-  '--x-message-body': argv[`--x-message-body`] || `compatible`,
-  '--after': argv[`--after`],
-  '--before': argv[`--before`],
+const cli = {
+  ...argv,
+  '--debug': argv[`--debug`] || false,
   '--select': argv[`--select`] ? argv[`--select`].split(`,`) : [`default`],
 }
 
 { // 关联参数特殊处理
-  if(query['--help']) {
-    const cliName = `gitday`
-    help({cliName})
+  if(cli['--help']) {
+    help()
     process.exit()
   }
-  // 根据 --x-template 预处理时间
-  query['--after'] = query['--after'] || util.handleLogTime({query}).after
-  query['--before'] = query['--before'] || util.handleLogTime({query}).before
+  if(cli['--config']) {
+    util.opener(GET(`configdir`))
+    process.exit()
+  }
+  if(cli['-v'] || cli['--version']) {
+    util.print(GET(`package`).version)
+    process.exit()
+  }
 }
 
-console.log(`query`, query)
-global.query = query
+SET(`cli`, cli)
 
-{ // 使用配置
-  const config = require(`./config/cfg.js`)
-  const reportList = config.report.filter(item => global.query[`--select`].includes(item.select))
-  reportList.forEach(reportItem => {
-    const repository = reportItem.repository.map(repositoryItem => {
-      const cmdRes = execSync(
-        util.logLine({query}),
+const config = GET(`config`)
+const reportList = config.report.filter(item => cli[`--select`].includes(item.select))
+reportList.forEach(reportItem => {
+  const newReportItem = util.handleReportConfig({reportItem, query: cli})
+  SET(`curReport`, newReportItem)
+  const repository = newReportItem.repository.map(repositoryItem => {
+    let cmdRes = ``
+    try {
+      cmdRes = execSync(
+        util.logLine(newReportItem),
         {
           cwd: repositoryItem.path,
         }
       )
-      const list = paserLogToList(cmdRes)
-      const toMdRes = toMd({tag: query['--x-template'], list})
-      return [
-        `# ${repositoryItem.name}`,
-        toMdRes,
-        `\n`,
-      ].join(`\n`)
-    }).join(`\n`).trim()
-    require(`fs`).writeFileSync(reportItem.outFile, repository)
-    print(repository)
-  })
-}
-
-
-process.exit()
+    } catch (error) {
+      util.errExit(`获取 git 工作记录失败`, error)
+    }
+    const list = paserLogToList({str: cmdRes})
+    const toMdRes = toMd({
+      list,
+      rootLevel: newReportItem.rootLevel,
+    })
+    const obj = {
+      name: `${`#`.repeat(util.getTitleLevel({type: `repository`, rootLevel: newReportItem.rootLevel}))} ${repositoryItem.name}`,
+      toMdRes
+    }
+    return [
+      obj.name,
+      obj.toMdRes,
+      `\n`,
+    ].join(`\n`)
+  }).join(`\n`).trim()
+  const out = util.handleTemplateFile({report: reportItem, body: repository})
+  require(`fs`).writeFileSync(newReportItem.outFile, out)
+})
