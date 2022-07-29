@@ -5,6 +5,7 @@ const path = require('path')
 const moment = require('moment')
 const mustache = require('mustache')
 const opener = require('./lib/opener.js')
+const unionby = require('lodash.unionby')
 
 
 function removeLeft(str) {
@@ -103,7 +104,7 @@ function paserLogToList({str}) {
   const authorList = GET(`curReport`).author || []
   str = `\n${str}`
   const tag = /\ncommit /
-  const list = str.split(tag).filter(item => item.trim()).map(rawMsg => {
+  let list = str.split(tag).filter(item => item.trim()).map(rawMsg => {
     rawMsg = `commit ${rawMsg}`
     const obj = {}
     obj.raw = rawMsg
@@ -129,6 +130,7 @@ function paserLogToList({str}) {
       )
     )
   })
+  list = unionby(list, `msg`)
   return list
 }
 

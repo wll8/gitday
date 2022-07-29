@@ -84,6 +84,12 @@ gitday --config
 - repository
   - [x] 从哪些仓库中生成报告, 多个使用逗号分割
   - 默认值: 当前仓库
+- noEqualMsg
+  - [x] 过滤掉重复的 msg
+  - 可选值
+    - true
+    - false
+  - 默认值: true
 
 
 ## todo

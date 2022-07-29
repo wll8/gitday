@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+lodash.unionby@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.npmmirror.com/lodash.unionby/-/lodash.unionby-4.8.0.tgz#883f098ff78f564a727b7508e09cdd539734bb83"
+  integrity sha512-e60kn4GJIunNkw6v9MxRnUuLYI/Tyuanch7ozoCtk/1irJTYBj+qNTxr5B3qVflmJhwStJBv387Cb+9VOfABMg==
+
 moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.npmmirror.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"

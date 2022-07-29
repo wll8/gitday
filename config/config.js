@@ -12,6 +12,7 @@ module.exports = {
       before: ``,
       outFile: `./${GET(`package`).name}.out.md`,
       insertFile: undefined,
+      noEqualMsg: true,
       rootLevel: 2,
       repository: [], // 当前项目
     },
