@@ -6,6 +6,7 @@ const moment = require('moment')
 const mustache = require('mustache')
 const opener = require('./lib/opener.js')
 const unionby = require('lodash.unionby')
+const pkg = require(`./package.json`)
 
 
 function removeLeft(str) {
@@ -43,8 +44,7 @@ function logLine({after, before}) {
 }
 
 function help() {
-  const { homepage } = require(`./package.json`)
-  print(`请访问 ${homepage} 查看使用文档`)
+  print(`请访问 ${pkg.homepage} 查看使用文档`)
   opener(homepage)
 }
 
@@ -344,7 +344,6 @@ function errExit(msg, error) {
  * 初始化程序
  */
 function init() {
-  const pkg = require(`./package.json`)
   global.SET = (key, val) => {
     print(`SET`, key, val)
     global[`${pkg.name}_${key}`] = val
