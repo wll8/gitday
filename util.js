@@ -364,8 +364,8 @@ function init() {
   
   // 如果文件不存在, 则创建它们
   [
-    [`./config/config.js`, GET(`configFilePath`)],
-    [`./config/default.template.md`, `${GET(`configdir`)}/default.template.md`],
+    [`${__dirname}/config/config.js`, GET(`configFilePath`)],
+    [`${__dirname}/config/default.template.md`, `${GET(`configdir`)}/default.template.md`],
   ].forEach(([form, to]) => {
     if(
       (fs.existsSync(to) === false)
