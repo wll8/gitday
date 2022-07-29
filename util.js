@@ -317,12 +317,20 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
 
   newReport.author = cli[`--author`] 
     ? cli[`--author`].split(`,`) 
-    : ((cfg.author && cfg.author.length) || [getDefaultGitName()]);
+    : (
+      (cfg.author && cfg.author.length) 
+      ? cfg.author 
+      : [getDefaultGitName()]
+    );
 
   newReport.authorName = newReport.authorName || newReport.author[0]
   newReport.repository = cli[`--repository`] 
     ? cli[`--author`].split(`,`).map(item => ({path: item, name: path.parse(item).name})) 
-    : ((cfg.repository && cfg.repository.length) || [{path: curPath, name: curPathName}]);
+    : (
+      (cfg.repository && cfg.repository.length) 
+      ? cfg.repository 
+      : [{path: curPath, name: curPathName}]
+    );
   return newReport
 }
 
