@@ -6,11 +6,14 @@
 # 安装
 npm i -g wll8/gitday
 
-# 生成月/周报
+# 生成当月工作报告
 gitday
 
+# 指定开始时间生成报告
+gitday after=2021-01-01
+
 # 生成周报
-gitday --template=week
+gitday template=week
 
 # 查看使用说明
 gitday --help
@@ -23,7 +26,7 @@ gitday --config
 ```
 
 ## 选项
-这些选项来自配置文件，你可以使用 `gitday --config` 打开配置文件所在位置，也可以在使用时通过命令行设置报告参数, 例如 `gitday --author=wll8` 。
+这些选项来自配置文件，你可以使用 `gitday --config` 打开配置文件所在位置，也可以在使用时通过命令行设置报告参数, 例如 `gitday author=wll8` 。
 
 - select
   - [x] 你可以使用配置文件保存多个报告，批量生成它们，多个使用逗号分割。
@@ -82,7 +85,12 @@ gitday --config
   - [x] 从多少个#号开始表示生成内容中最高级别标题, 不包含文档根结点标题, 根节点标题的级别应在 report.title 中添加
   - 默认值: 2
 - repository
-  - [x] 从哪些仓库中生成报告, 多个使用逗号分割
+  - [x] 从哪些仓库中生成报告
+  - 可选值
+    - string 本地仓库绝对路径, 多个时使用逗号分割
+    - array
+      - path 本地仓库绝对路径
+      - name 项目名称
   - 默认值: 当前仓库
 - noEqualMsg
   - [x] 过滤掉重复的 msg

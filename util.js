@@ -48,7 +48,7 @@ function logLine({after, before}) {
 
 function help() {
   print(`请访问 ${pkg.homepage} 查看使用文档`)
-  opener(homepage)
+  opener(pkg.homepage)
 }
 
 function execSync(cmd, option) {
