@@ -32,11 +32,13 @@ function print(...arg) {
  * @returns string
  */
 function logLine({after, before}) {
+  // 由于 git --before 包含当天, 但 --after 不包含当天, 所以 after 需要再推前
+  const newAfter = moment(after).add({day: -1}).format(`YYYY-MM-DD`)
   const str = [
     `git`,
     `log`,
     `--all`,
-    `--after=${after}`,
+    `--after=${newAfter}`,
     `--before=${before}`,
     `--no-merges`,
     `--format=fuller`,
