@@ -59,10 +59,21 @@ function dateFormater(t, formater) { // 时间格式化
   return moment(date).format(formater)
 }
 
-function parseArgv() {
-  return process.argv.slice(2).reduce((acc, arg) => {
-    let [k, v = true] = arg.split('=')
-    acc[k] = v
+function parseArgv(arr) { // 解析命令行参数
+  return (arr || process.argv.slice(2)).reduce((acc, arg) => {
+    let [k, ...v] = arg.split(`=`)
+    v = v.join(`=`) // 把带有 = 的值合并为字符串
+    acc[k] = v === `` // 没有值时, 则表示为 true
+      ? true
+      : (
+        /^(true|false)$/.test(v) // 转换指明的 true/false
+        ? v === `true`
+        : (
+          /[\d|.]+/.test(v)
+          ? (isNaN(Number(v)) ? v : Number(v)) // 如果转换为数字失败, 则使用原始字符
+          : v
+        )
+      )
     return acc
   }, {})
 }
@@ -70,11 +81,13 @@ function parseArgv() {
 function handleMsg(rawMsg) {
   let msg = ((rawMsg.match(/(\n\n)([\s\S]+?$)/) || [])[2] || ``)
   msg = removeLeft(msg)
+  let [one, ...body] = msg.split(`\n`)
+  one = handleOneMsg(one)
+  let newMsg = ``
   if(GET(`curReport`).messageBody === `none`) { // 不使用 body
-    msg = msg.split(`\n`)[0]
+    newMsg = one
   }
   if(GET(`curReport`).messageBody === `compatible`) { // 当 body 含有可能破坏报告的内容时不使用
-    const [one, ...body] = msg.split(`\n`)
     if(
       // 含有 body 时
       (body.filter(item => item.trim()) > 1)
@@ -86,14 +99,53 @@ function handleMsg(rawMsg) {
         // || item.match(/^#{1,6}\s+/).split(`-`).filter(item => item).length === 0
       ))
     ) {
-      msg = one
+      newMsg = one
+    } else {
+      newMsg = [one, ...body].join(`\n`)
     }
   }
   if(GET(`curReport`).messageBody === `raw`) { // 原样使用 body
-    msg = msg
+    newMsg = [one, ...body].join(`\n`)
   }
-  msg = msg.trim()
-  return msg
+  newMsg = newMsg.trim()
+  return newMsg
+}
+
+/**
+ * 根据 git commit 规范转换 msg 风格
+ */
+function handleOneMsg(msg) {
+  const {type, scope, subject} = parseMsg(msg)
+  let newMsg = msg
+  const [key, val] = Object.entries(GET(`curReport`).messageConvert).find(([key, val]) => {
+    const {rating} = stringSimilarity.findBestMatch(type, [key, ...val.alias]).bestMatch
+    return (rating > GET(`curReport`).messageTypeSimilarity)
+  }) || []
+  if(key) {
+    const template = scope ? val.des.text[1] : val.des.text[0]
+    const text = render( [template, subject].join(``), {scope})
+    const emoji = val.des.emoji
+    const newText = render(GET(`curReport`).messageTypeTemplate, {text, emoji})
+    newMsg = newText
+  }
+  return newMsg
+}
+
+/**
+ * 解析 git msg 中的 type scope subject
+ * arg0 string
+ * @param {*} msg 
+ * @returns 
+ */
+function parseMsg(msg) {
+  let type, scope, subject
+  ;[, type = ``, subject = ``] = msg.trim().match(/(.+?)[:：][\s+](.*$)/) || []
+  ;[, type = ``, scope = ``] = type.trim().match(/\s{0}(.+?)\s{0}\(\s{0,}(.*)\s{0,}\)$/) || [, type]
+  type = type.trim()
+  scope = scope.trim()
+  subject = subject.trim()
+  const res = {type, scope, subject}
+  return res
 }
 
 /**
@@ -343,7 +395,6 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
   // 根据 --template 预处理时间
   newReport.after = newReport.after || handleLogTime({template: newReport.template}).after
   newReport.before = newReport.before || handleLogTime({template: newReport.template}).before
-  newReport.similarity = Number(newReport.similarity)
 
   newReport.author = cli[`--author`] 
     ? cli[`--author`].split(`,`) 

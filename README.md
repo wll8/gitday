@@ -95,7 +95,35 @@ gitday --config
   - 可选值
     - 0 到 1 之前的值
   - 默认值: 0.75
-
+- messageTypeSimilarity
+  - [x] 配置 message type 的相似程度
+  - 可选值
+    - 0 到 1 之前的值
+  - 默认值: 0.8
+- noUnknownType
+  - [x] 是否移除未知的 type
+  - 可选值
+    - true
+    - false
+  - 默认值: false
+- messageTypeTemplate
+  - [x] 配置 message 的生成模板
+  - 可选值
+    - 可使用字符串模板, 支持使用 messageConvert[type].des 中的变量
+  - 默认值: `#{emoji}#{text}`
+- messageConvert
+  - [x] 配置 message 的详细生成规则
+  - 可选值
+    - false 不进行转换
+    - object [自定义请参考](./config/config.js)
+      - [type] git commit message type 标志
+        - alias array type 别名
+        - des type 转换配置
+          - emoji 表情
+          - text type 和 scope 的转换模板
+            - 0 没有 scope 时的模板
+            - 1 有 scope 时的模板
+  - 默认值: [参考 config.js](./config/config.js)
 
 ## todo
 - [ ] feat: 如果只有一个时间结点时, 则不显示它. 比如下面内容, 当为本周周报时, 重复显示 `2022年07月 第4周` 是没有意义的.
@@ -116,22 +144,4 @@ gitday --config
   - 移除 commit title 与 body 之前的空行
   - 移除 body 后面多于的空行
   - 合并两个空行为一个
-  - 转换 msg 提交标志, 例如转换 `fix(client): xxx` 为 `修复 client 中的缺陷: xxx`
-    ```
-    # 主要type
-    feat:     增加新功能
-    fix:      修复bug
-
-    # 特殊type
-    docs:     只改动了文档相关的内容
-    style:    不影响代码含义的改动，例如去掉空格、改变缩进、增删分号
-    build:    构造工具的或者外部依赖的改动，例如webpack，npm
-    refactor: 代码重构时使用
-    revert:   执行git revert打印的message
-
-    # 暂不使用type
-    test:     添加测试或者修改现有测试
-    perf:     提高性能的改动
-    ci:       与CI（持续集成服务）有关的改动
-    chore:    不修改src或者test的其余修改，例如构建过程或辅助工具的变动
-    ```
+  - [x] 转换 msg 提交标志, 例如转换 `fix(client): xxx` 为 `修复 client 中的缺陷: xxx`
