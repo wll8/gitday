@@ -90,6 +90,11 @@ gitday --config
     - true
     - false
   - 默认值: true
+- similarity
+  - [x] 过滤掉大于给定相似值的 msg
+  - 可选值
+    - 0 到 1 之前的值
+  - 默认值: 0.75
 
 
 ## todo

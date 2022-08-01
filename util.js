@@ -4,6 +4,7 @@ const cp = require('child_process')
 const path = require('path')
 const moment = require('moment')
 const mustache = require('mustache')
+const stringSimilarity = require('string-similarity')
 const opener = require('./lib/opener.js')
 const unionby = require('lodash.unionby')
 const pkg = require(`./package.json`)
@@ -130,9 +131,37 @@ function paserLogToList({str}) {
       )
     )
   })
-  list = unionby(list, `msg`)
+  // 去除重复的 msg
+  GET(`curReport`).noEqualMsg && (list = unionby(list, `msg`));
+  // 去除大于指定相似度的 msg
+  GET(`curReport`).similarity && (list = list = removeSimilarity({list, key: `msg`, similarity: GET(`curReport`).similarity}));
   return list
 }
+
+/**
+ * 删除数组中指定字段的相似度大于指定值的数组
+ * arg.list 提供的数组
+ * arg.key 要比较相似度的字段
+ * arg.similarity 相似值
+ */
+function removeSimilarity({list, key = `msg`, similarity = 0.75}) {
+  let msgList = list.map(item => item[key])
+  let res = []
+  msgList.forEach((msg, index) => {
+    let newList = [...msgList]
+    newList.splice(index, 1)
+    const diff = stringSimilarity.findBestMatch(msg, newList)
+      .ratings
+      .filter(item => {
+        return item.rating > similarity
+      }).map(item => item.target)
+      const select = diff.length ? diff[0] : msg
+      res = res.includes(select) ? res :  res.concat(msg)
+  })
+  const newList = list.filter(item => res.includes(item[key]))
+  return newList
+}
+
 
 /**
  * 根据指定的 key 排序
@@ -314,6 +343,7 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
   // 根据 --template 预处理时间
   newReport.after = newReport.after || handleLogTime({template: newReport.template}).after
   newReport.before = newReport.before || handleLogTime({template: newReport.template}).before
+  newReport.similarity = Number(newReport.similarity)
 
   newReport.author = cli[`--author`] 
     ? cli[`--author`].split(`,`) 

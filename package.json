@@ -16,6 +16,7 @@
     "lodash.unionby": "^4.8.0",
     "moment": "^2.29.4",
     "mustache": "^4.2.0",
-    "opener": "^1.5.2"
+    "opener": "^1.5.2",
+    "string-similarity": "^4.0.4"
   }
 }

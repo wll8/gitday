@@ -14,6 +14,7 @@ module.exports = {
       insertFile: undefined,
       noEqualMsg: true,
       rootLevel: 2,
+      similarity: 0.75,
       repository: [], // 当前项目
     },
   ],
