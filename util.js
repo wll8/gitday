@@ -392,14 +392,14 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
     // 配置值
     ...cfg,
     // 命令行值
-    ...Object.entries(cli).reduce((acc, [key, val]) => ({...acc, [key.replace(`--`, ``)]: val}), {})
+    ...Object.entries(cli).reduce((acc, [key, val]) => ({...acc, [key]: val}), {})
   }
-  // 根据 --template 预处理时间
+  // 根据 template 预处理时间
   newReport.after = newReport.after || handleLogTime({template: newReport.template}).after
   newReport.before = newReport.before || handleLogTime({template: newReport.template}).before
 
-  newReport.author = cli[`--author`] 
-    ? cli[`--author`].split(`,`) 
+  newReport.author = cli[`author`] 
+    ? cli[`author`].split(`,`) 
     : (
       (cfg.author && cfg.author.length) 
       ? cfg.author 
@@ -407,8 +407,8 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
     );
 
   newReport.authorName = newReport.authorName || newReport.author[0]
-  newReport.repository = cli[`--repository`] 
-    ? cli[`--author`].split(`,`).map(item => ({path: item, name: path.parse(item).name})) 
+  newReport.repository = cli[`repository`] 
+    ? cli[`author`].split(`,`).map(item => ({path: item, name: path.parse(item).name})) 
     : (
       (cfg.repository && cfg.repository.length) 
       ? cfg.repository 

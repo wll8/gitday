@@ -6,7 +6,7 @@
     "gitday": "index.js"
   },
   "scripts": {
-    "dev": "node index.js --template=week --messageBody=none --after=2022-06-18 --before=2022-07-24 --select=test"
+    "dev": "node index.js template=week messageBody=none after=2022-06-01 before=2022-07-31 --select=default"
   },
   "homepage": "https://github.com/wll8/gitday",
   "keywords": [],
