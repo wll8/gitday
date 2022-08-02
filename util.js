@@ -120,7 +120,7 @@ function handleOneMsg(msg) {
   const {type, scope, subject} = parseMsg(msg)
   let newMsg = msg
   const [key, val] = Object.entries(GET(`curReport`).messageConvert).find(([key, val]) => {
-    const {rating} = stringSimilarity.findBestMatch(type, [key, ...val.alias]).bestMatch
+    const {rating} = stringSimilarity.findBestMatch(type.toLocaleLowerCase(), [key, ...val.alias].map(item => item.toLocaleLowerCase())).bestMatch
     return (rating > GET(`curReport`).messageTypeSimilarity)
   }) || []
   if(key) {
