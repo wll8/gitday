@@ -97,7 +97,8 @@ module.exports = {
             text: [`更新辅助工具: `, `更新@{scope}中的辅助工具: `],
           },
         },
-      }
+      },
+      ignoreAuthor: false,
     },
   ],
 }

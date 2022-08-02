@@ -179,6 +179,7 @@ function paserLogToList({str}) {
         && moment(item.date).isSameOrAfter(GET(`curReport`).after)
       )
       && ( // 作者
+        GET(`curReport`).ignoreAuthor ||
         authorList.some(author => {
           return item.author.startsWith(`${author} <`)
         } ) 

@@ -49,9 +49,14 @@ gitday --config
 - author
   - [x] 指定要生成报告的 git 用户名
   - 可选值
-    - `*` 不过滤用户名
     - 其他你自己指定的用户名，多个使用逗号分割
   - 默认值 `当前 git 用户`, 即 `git config user.name` 的值
+- ignoreAuthor
+  - 是否忽略按用户名进行过滤
+  - 可选值
+    - true
+    - false
+  - 默认值 false
 - authorName
   - [x] 实际输出到报告中的名称, 例如 git 用户名和报告中所需姓名不同时
   - 默认值 `当前 git 用户`
@@ -140,6 +145,7 @@ gitday --config
   - 默认值: [参考 config.js](./config/config.js)
 
 ## todo
+- [ ] fix: 应使用保险的方式检查 messageBody 中的内容
 - [ ] feat: 如果只有一个时间结点时, 则不显示它. 比如下面内容, 当为本周周报时, 重复显示 `2022年07月 第4周` 是没有意义的.
   ``` md
   # 项目一
