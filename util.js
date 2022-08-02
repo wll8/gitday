@@ -291,7 +291,7 @@ function create({list, rootLevel}) {
 }
 
 function debug({item}) {
-  if(GET(`curReport`).debug) {
+  if(GET(`cli`)[`--debug`]) {
     return `${item.date} ${item.commit} ${item.author}\n  `
   } else {
     return ``
