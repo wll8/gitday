@@ -37,7 +37,7 @@ function logLine({after, before}) {
   const str = [
     `git`,
     `log`,
-    `--all`,
+    `--branches`,
     `--after=${newAfter}`,
     `--before=${before}`,
     `--no-merges`,
