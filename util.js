@@ -200,6 +200,9 @@ function paserLogToList({str}) {
  * arg.similarity 相似值
  */
 function removeSimilarity({list, key = `msg`, similarity = 0.75}) {
+  if(list.length < 2) {
+    return list
+  }
   let msgList = list.map(item => item[key])
   let res = []
   msgList.forEach((msg, index) => {
