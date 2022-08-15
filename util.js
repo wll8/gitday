@@ -24,7 +24,7 @@ function removeLeft(str) {
 }
 
 function print(...arg) {
-  return console.log(...arg)
+  return console._log(...arg)
 }
 
 /**
@@ -47,12 +47,13 @@ function logLine({after, before}) {
 }
 
 function help() {
-  print(`请访问 ${pkg.homepage} 查看使用文档`)
+  print(fs.readFileSync(`./README.md`, `utf8`))
+  print(`\n访问 ${pkg.homepage} 查看详情`)
   opener(pkg.homepage)
 }
 
 function execSync(cmd, option) {
-  print(`>`, cmd)
+  console.log(`>`, cmd)
   return cp.execSync(cmd, option).toString().trim()
 }
 
@@ -440,7 +441,7 @@ function errExit(msg, error) {
  */
 function init() {
   global.SET = (key, val) => {
-    print(`SET`, key, val)
+    console.log(`SET`, key, val)
     global[`${pkg.name}_${key}`] = val
     return val
   }

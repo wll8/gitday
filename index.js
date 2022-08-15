@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+console._log = console.log
+console.log = () => {}
 const util = require(`./util.js`)
 util.init()
 const {
