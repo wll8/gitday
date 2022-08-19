@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>gitday.out.month-week.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>王小花的工作报告(2022-08-01 至 2022-08-31)</p>
+<ul>
+<li><a href="#1-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A">1. 工作报告</a>
+<ul>
+<li><a href="#11-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A%E7%94%9F%E6%88%90%E5%99%A8">1.1. 工作报告生成器</a>
+<ul>
+<li><a href="#111-2022%E5%B9%B408%E6%9C%88">1.1.1. 2022年08月</a>
+<ul>
+<li><a href="#1111-%E7%AC%AC3%E5%91%A8">1.1.1.1. 第3周</a></li>
+<li><a href="#1112-%E7%AC%AC1%E5%91%A8">1.1.1.2. 第1周</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#12-markdown-%E8%BD%AC%E6%8D%A2%E5%B7%A5%E5%85%B7">1.2. markdown 转换工具</a>
+<ul>
+<li><a href="#121-2022%E5%B9%B408%E6%9C%88">1.2.1. 2022年08月</a>
+<ul>
+<li><a href="#1211-%E7%AC%AC3%E5%91%A8">1.2.1.1. 第3周</a></li>
+<li><a href="#1212-%E7%AC%AC2%E5%91%A8">1.2.1.2. 第2周</a></li>
+<li><a href="#1213-%E7%AC%AC1%E5%91%A8">1.2.1.3. 第1周</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#13-%E6%8E%A5%E5%8F%A3%E4%BC%B4%E4%BE%A3">1.3. 接口伴侣</a>
+<ul>
+<li><a href="#131-2022%E5%B9%B408%E6%9C%88">1.3.1. 2022年08月</a>
+<ul>
+<li><a href="#1311-%E7%AC%AC3%E5%91%A8">1.3.1.1. 第3周</a></li>
+<li><a href="#1312-%E7%AC%AC1%E5%91%A8">1.3.1.2. 第1周</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#2-%E5%90%8E%E7%BB%AD%E8%AE%A1%E5%88%92">2. 后续计划</a>
+<ul>
+<li><a href="#21-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A%E7%94%9F%E6%88%90%E5%99%A8">2.1. 工作报告生成器</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>大家好，以下内容是我的工作报告和后续计划，不足之处敬请指正。</p>
+<h2 id="1-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A">1. 工作报告</h2>
+<p>小结：在这个阶段中，主要精力集中在 <code>工作报告生成器</code> 这个项目，以及 <code>添加功能</code> 。 处理 <code>支持过滤掉相似度较高的 msg</code> 这项工作消耗了比预期较多的时间，主要原因是 <code>在实现功能上需要处理比较多的逻辑</code> 。</p>
+<h3 id="11-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A%E7%94%9F%E6%88%90%E5%99%A8">1.1. 工作报告生成器</h3>
+<h4 id="111-2022%E5%B9%B408%E6%9C%88">1.1.1. 2022年08月</h4>
+<h5 id="1111-%E7%AC%AC3%E5%91%A8">1.1.1.1. 第3周</h5>
+<ul>
+<li>
+<p>🔧更新辅助工具: 屏蔽无关日志, 使用 readme 作为 help 输出</p>
+</li>
+<li>
+<p>✨添加功能: 更新默认模板</p>
+</li>
+<li>
+<p>🐛修复缺陷: git log 结果仅有一条时不应出现错误</p>
+<pre class="hljs"><code><div>Error: Bad arguments: First argument should be a string, second should be an array of strings
+</div></code></pre>
+</li>
+</ul>
+<h5 id="1112-%E7%AC%AC1%E5%91%A8">1.1.1.2. 第1周</h5>
+<ul>
+<li>
+<p>✨添加功能: 比较 commit msg 时忽略大小写</p>
+</li>
+<li>
+<p>✨添加功能: 支持 ignoreAuthor 参数, 是否忽略按用户名进行过滤</p>
+</li>
+<li>
+<p>✨添加功能: 使用 --branches 参数而不是 --all 参数</p>
+</li>
+<li>
+<p>🐛修复缺陷: 修复 --debug 参数失效</p>
+</li>
+<li>
+<p>✨添加功能: 从命令行覆盖配置项不再需要 -- 前缀</p>
+</li>
+<li>
+<p>🐛修复缺陷: 处理 --help 报错</p>
+</li>
+<li>
+<p>🐛修复缺陷: 需要显示当天内容</p>
+<ul>
+<li>例如当天是 2022-08-01, 并且当天有 commit, 但是运行 <code>after=2022-08-01 before=2022-08-31</code> 没有任何输出. 运行 <code>after=2022-07-31 before=2022-07-31</code> 也没有输出.</li>
+<li>应变更为包含当天</li>
+</ul>
+</li>
+<li>
+<p>✨添加功能: 转换 msg 提交标志</p>
+<p>例如转换 <code>fix(client): xxx</code> 为 <code>修复 client 中的缺陷: xxx</code></p>
+</li>
+<li>
+<p>✨添加功能: 支持过滤掉相似度较高的 msg</p>
+</li>
+</ul>
+<h3 id="12-markdown-%E8%BD%AC%E6%8D%A2%E5%B7%A5%E5%85%B7">1.2. markdown 转换工具</h3>
+<h4 id="121-2022%E5%B9%B408%E6%9C%88">1.2.1. 2022年08月</h4>
+<h5 id="1211-%E7%AC%AC3%E5%91%A8">1.2.1.1. 第3周</h5>
+<ul>
+<li>📝更新文档: update readme</li>
+<li>🐛修复缺陷: 不应屏蔽 console.log, 因为源插件使用它输出错误</li>
+</ul>
+<h5 id="1212-%E7%AC%AC2%E5%91%A8">1.2.1.2. 第2周</h5>
+<ul>
+<li>
+<p>✨添加功能: 简化输入参数</p>
+</li>
+<li>
+<p>🔧更新辅助工具: 更新文档, 修剪日志</p>
+</li>
+<li>
+<p>✨添加功能: 简化输入的命令</p>
+<ul>
+<li>前: extension.js cmd=extension.markdown-pdf.pdf</li>
+<li>后: extension.js out=pdf</li>
+</ul>
+</li>
+<li>
+<p>✨添加功能: 优化 input 参数合法性判断</p>
+</li>
+<li>
+<p>✨添加功能: 实现从命令行导出 pdf</p>
+<pre class="hljs"><code><div>extension.js cmd=extension.markdown-pdf.pdf input=D:/README.zh.md
+</div></code></pre>
+</li>
+</ul>
+<h5 id="1213-%E7%AC%AC1%E5%91%A8">1.2.1.3. 第1周</h5>
+<ul>
+<li>
+<p>✨添加功能: 实现对象拦截, 目前验证 vscode 功能正常</p>
+</li>
+<li>
+<p>✨添加功能: 使用自己实现的方法简单实现拦截</p>
+</li>
+<li>
+<p>✨添加功能: 在 node 环境创建 vscode proxy</p>
+<p>但是在 vscode 环境会导致 proxy 失败.</p>
+<p>如果对 vscode 对象进行代理, 会报以下错误:</p>
+<pre class="hljs"><code><div>TypeError: 'get' on proxy: property 'getText' is a read-only and non-configurable data property on the proxy target but the proxy did not return its actual value (expected 'getText(p){return p?w._getTextInRange(p):w.getText()}' but got 'getText(p){return p?w._getTextInRange(p):w.getText()}')
+</div></code></pre>
+</li>
+<li>
+<p>🔧更新辅助工具: 添加 vsce package 和 npm build 命令</p>
+</li>
+</ul>
+<h3 id="13-%E6%8E%A5%E5%8F%A3%E4%BC%B4%E4%BE%A3">1.3. 接口伴侣</h3>
+<h4 id="131-2022%E5%B9%B408%E6%9C%88">1.3.1. 2022年08月</h4>
+<h5 id="1311-%E7%AC%AC3%E5%91%A8">1.3.1.1. 第3周</h5>
+<ul>
+<li>🐛修复缺陷: 避免 config.openApi 配置为空数组时出现读取错误</li>
+</ul>
+<h5 id="1312-%E7%AC%AC1%E5%91%A8">1.3.1.2. 第1周</h5>
+<ul>
+<li>
+<p>✨添加功能: 调整一些依赖为可选项</p>
+<p>注: yarn install 使用 --ignore-optional 或 --production 时依然会请求可选项中的依赖表文件</p>
+</li>
+<li>
+<p>✨添加功能: 把动态依赖放置于 optionalDependencies</p>
+<p>因为动态安装经常不太稳定, 如果放置在可选依赖中则可以在第一次安装时尝试安装它们, 就算安装失败了也没有关系</p>
+</li>
+<li>
+<p>🐛修复缺陷: hasPackage 不应只检测子级 node_modules</p>
+<p>例如全局安装时, npm 会把 node_modules 进行扁平化, 例如 md-cli 依赖了 mockm, 安装 md-cli 时, 只会存在 md-cli/node_modules 而不会存在 md-cli/node_modules/mockm/node_modules .</p>
+</li>
+</ul>
+<h2 id="2-%E5%90%8E%E7%BB%AD%E8%AE%A1%E5%88%92">2. 后续计划</h2>
+<h3 id="21-%E5%B7%A5%E4%BD%9C%E6%8A%A5%E5%91%8A%E7%94%9F%E6%88%90%E5%99%A8">2.1. 工作报告生成器</h3>
+<ul>
+<li><input type="checkbox" id="checkbox0"><label for="checkbox0">feat: 支持生成 html/pdf/jpeg...</label></li>
+<li><input type="checkbox" id="checkbox1"><label for="checkbox1">feat: 支持作为邮件自动发送</label></li>
+</ul>
+
+</body>
+</html>
