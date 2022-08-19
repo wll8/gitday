@@ -3,8 +3,8 @@
 
 **效果演示**  
 
-- [👉 多项目 week 格式的报告](https://wll8.github.io/gitwork/example/gitwork.out.week.html)
-- [👉 多项目 month-week 格式的报告](https://wll8.github.io/gitwork/example/gitwork.out.month-week.html)
+- [👉 多项目 week 格式的报告](https://wll8.github.io/gitday/example/gitwork.out.week.html)
+- [👉 多项目 month-week 格式的报告](https://wll8.github.io/gitday/example/gitwork.out.month-week.html)
 
 ## 使用
 ``` sh
