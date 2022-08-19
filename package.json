@@ -1,14 +1,18 @@
 {
-  "name": "gitday",
+  "name": "gitwork",
   "version": "2.0.2",
   "description": "",
   "bin": {
-    "gitday": "index.js"
+    "gitwork": "index.js"
   },
   "scripts": {
     "dev": "node index.js template=week messageBody=none after=2022-06-01 before=2022-07-31 --select=default"
   },
-  "homepage": "https://github.com/wll8/gitday",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wll8/gitday.git"
+  },
+  "homepage": "https://wll8.github.io/gitday/",
   "keywords": [],
   "author": "xw",
   "license": "ISC",

@@ -1,33 +1,33 @@
-# gitday
+# gitwork
 读取 git log 的数据生成类似月报/周报/日报的 markdown  
 
 **效果演示**  
 
-- [👉 多项目 week 格式的报告](https://wll8.github.io/gitday/example/gitday.out.week.html)
-- [👉 多项目 month-week 格式的报告](https://wll8.github.io/gitday/example/gitday.out.month-week.html)
+- [👉 多项目 week 格式的报告](https://wll8.github.io/gitwork/example/gitwork.out.week.html)
+- [👉 多项目 month-week 格式的报告](https://wll8.github.io/gitwork/example/gitwork.out.month-week.html)
 
 ## 使用
 ``` sh
 # 安装
-npm i -g wll8/gitday
+npm i -g gitwork
 
 # 生成当月工作报告
-gitday
+gitwork
 
 # 指定开始时间生成报告
-gitday after=2021-01-01
+gitwork after=2021-01-01
 
 # 生成周报
-gitday template=week
+gitwork template=week
 
 # 查看使用说明
-gitday --help
+gitwork --help
 
 # 查看版本号
-gitday -v
+gitwork -v
 
 # 打开配置文件所在位置
-gitday --config
+gitwork --config
 ```
 
 ## 命令行参数
@@ -37,7 +37,7 @@ gitday --config
 - --select 选择报告配置
 
 ## 可配置项
-这些选项来自配置文件，你可以使用 `gitday --config` 打开配置文件所在位置，也可以在使用时通过命令行设置报告参数, 例如 `gitday author=wll8` 。
+这些选项来自配置文件，你可以使用 `gitwork --config` 打开配置文件所在位置，也可以在使用时通过命令行设置报告参数, 例如 `gitwork author=wll8` 。
 
 - select
   - [x] 你可以使用配置文件保存多个报告，批量生成它们，多个使用逗号分割。
@@ -93,7 +93,7 @@ gitday --config
   - 默认值 `根据 template 转换`
 - outFile
   - [ ] 输出文件, 支持 .md .html .pdf .jpeg .word .xlsx, 相对于运行目录
-  - 默认值: `./gitday.out.md`
+  - 默认值: `./gitwork.out.md`
 - insertFile
   - [ ] 插入文件, 相对于运行目录
   - 默认值: `./todo.md`
