@@ -19,7 +19,7 @@ const cli = {
 }
 
 { // 关联参数特殊处理
-  if(cli['--help']) {
+  if(cli['--help'] || cli['-h']) {
     help()
     process.exit()
   }
