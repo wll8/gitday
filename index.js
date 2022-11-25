@@ -36,7 +36,11 @@ const cli = {
 SET(`cli`, cli)
 
 const config = GET(`config`)
-const reportList = config.report.filter(item => cli[`--select`].includes(item.select))
+let reportList = config.report.filter(item => cli[`--select`].includes(item.select))
+if(reportList.length === 0) {
+  util.print(`所指定的 --select 值不存在, 将使用默认值`)
+  reportList = config.report.filter(item => [`default`].includes(item.select))
+}
 reportList.forEach(reportItem => {
   const newReportItem = util.handleReportConfig({reportItem, query: cli})
   SET(`curReport`, newReportItem)
