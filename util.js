@@ -367,9 +367,9 @@ function getTitleLevel({type, rootLevel = 1}) {
  */
 function handleTemplateFile({report, body}) {
   const insertBody = render(``, GET(`curReport`))
-  const useFilePath = `${__dirname}/config/${report.useFile}` // 相对于配置文件的地址
-  const useFilePathDefault = `${__dirname}/config/default.template.md` // 相对于配置文件的地址
-  let mdBody = fs.existsSync(useFilePath) ? fs.readFileSync(useFilePath, `utf8`) : fs.readFileSync(useFilePathDefault, `utf8`)
+  const useFilePath = `${GET(`configdir`)}/${report.useFile}`
+  const useFilePathDefault = `${GET(`configdir`)}/default.template.md`
+  let mdBody = fs.existsSync(useFilePath) ? fs.readFileSync(useFilePath, `utf8`) : (print(`所指定的 useFile 值不存在, 将使用默认值`), fs.readFileSync(useFilePathDefault, `utf8`))
   mdBody = render(mdBody, GET(`curReport`))
   mdBody = mdBody.replace(/<!--\s+slot-body-start\s+-->([\s\S]+?)<!--\s+slot-body-end\s+-->/, ($0, $1) => (body || $1))
   mdBody = mdBody.replace(/<!--\s+slot-insert-start\s+-->([\s\S]+?)<!--\s+slot-insert-end\s+-->/, ($0, $1) => (insertBody || $1))
