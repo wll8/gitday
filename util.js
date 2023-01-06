@@ -49,7 +49,7 @@ function logLine({after, before}) {
 function help() {
   print(fs.readFileSync(`${__dirname}/README.md`, `utf8`))
   print(`\n访问 ${pkg.homepage} 查看详情`)
-  opener(pkg.homepage)
+  // opener(pkg.homepage)
 }
 
 function execSync(cmd, option) {
