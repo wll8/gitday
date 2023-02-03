@@ -84,7 +84,9 @@ function parseArgv(arr) { // 解析命令行参数
 function handleMsg(rawMsg) {
   let msg = ((rawMsg.match(/(\n\n)([\s\S]+?$)/) || [])[2] || ``)
   msg = removeLeft(msg)
-  let [one, ...body] = msg.split(`\n`)
+  let [, one, body] = msg.trim().match(/(.*)[\n]?([\s\S]*)/)
+  one = one.trim()
+  body = body.trim()
   one = handleOneMsg(one)
   let newMsg = ``
   if(GET(`curReport`).messageBody === `none`) { // 不使用 body
@@ -92,23 +94,15 @@ function handleMsg(rawMsg) {
   }
   if(GET(`curReport`).messageBody === `compatible`) { // 当 body 含有可能破坏报告的内容时不使用
     if(
-      // 含有 body 时
-      (body.filter(item => item.trim()) > 1)
-      // body 中有特殊样式时
-      && body.some(item => (
-        // 含有 # 标题
-        item.match(/^#{1,6}\s+/)
-        // 含有分割线
-        // || item.match(/^#{1,6}\s+/).split(`-`).filter(item => item).length === 0
-      ))
+      body.match(/^#{1,6}\s+/gm) // 含有 # 标题
     ) {
       newMsg = one
     } else {
-      newMsg = [one, ...body].join(`\n`)
+      newMsg = `${one}\n${body}`
     }
   }
   if(GET(`curReport`).messageBody === `raw`) { // 原样使用 body
-    newMsg = [one, ...body].join(`\n`)
+    newMsg = `${one}\n${body}`
   }
   newMsg = newMsg.trim()
   return newMsg

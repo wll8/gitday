@@ -176,8 +176,8 @@ gitwork --config
 - [ ] feat: 如果只有一个时间结点时, 则不显示它. 比如下面内容, 当为本周周报时, 重复显示 `2022年07月 第4周` 是没有意义的.
 - [ ] feat: 格式化输出
   - [x] 每个 commit 前插入一个空行
-  - 多行 commit 消息时再每行后面添加两个空格, 这样默认 markdown 才会显示换行效果
-  - 移除 commit title 与 body 之前的空行
-  - 移除 body 后面多于的空行
-  - 合并两个空行为一个
+  - [ ] 多行 commit 消息时再每行后面添加两个空格, 这样默认 markdown 才会显示换行效果
+  - [x] 移除 commit title 与 body 之前的空行
+  - [x] 移除 body 后面多于的空行
+  - [ ] 合并两个空行为一个
   - [x] 转换 msg 提交标志, 例如转换 `fix(client): xxx` 为 `修复 client 中的缺陷: xxx`
