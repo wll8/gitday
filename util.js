@@ -285,7 +285,7 @@ function create({list, rootLevel}) {
     } )
     const res = [
       titleStr.join(``),
-      `- ${debug({item})}${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
+      `\n- ${debug({item})}${ // 多行 msg 的时候在行前面加空格, 以处理缩进关系
         item.msg.split(`\n`).map((msgLine) => `  ${msgLine}`).join(`\n`).trim()
       }`
     ].filter(item => item).join(`\n`)
