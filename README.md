@@ -105,7 +105,7 @@ gitwork --config
     - compatible 当含有可能破坏报告的内容时不使用
   - 默认值: `compatible`
 - useFile
- - [x] 使用文件模板, 相对于配置文件目录
+  - [x] 使用文件模板, 相对于配置文件目录
   - 默认值: `./default.template.md`
 - after
   - 开始时间, YYYY-MM-DD 格式
