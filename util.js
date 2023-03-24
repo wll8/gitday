@@ -4,6 +4,7 @@ const cp = require('child_process')
 const path = require('path')
 const moment = require('moment')
 const mustache = require('mustache')
+mustache.escape = text => text // 不转义字符
 const stringSimilarity = require('string-similarity')
 const opener = require('./lib/opener.js')
 const unionby = require('lodash.unionby')
