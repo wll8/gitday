@@ -408,7 +408,7 @@ function handleReportConfig({reportItem: cfg, query: cli}) {
 
   newReport.authorName = newReport.authorName || newReport.author[0]
   newReport.repository = cli[`repository`] 
-    ? cli[`author`].split(`,`).map(item => ({path: item, name: path.parse(item).name})) 
+    ? cli[`repository`].split(`,`).map(item => ({path: item, name: path.parse(item).name})) 
     : (
       (cfg.repository && cfg.repository.length) 
       ? cfg.repository 
